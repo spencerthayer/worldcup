@@ -27,8 +27,8 @@ ALIASES = {
     "bosnia-herzegovina":"Bosnia and Herzegovina",
     "bosnia herzegovina":"Bosnia and Herzegovina",
     "united states":"USA","usa":"USA",
-    "turkiye":"Turkey","türkiye":"Turkey",
-    "ivory coast":"Ivory Coast","côte d'ivoire":"Ivory Coast",
+    "turkiye":"Turkey","turkiye":"Turkey",
+    "ivory coast":"Ivory Coast","cote d'ivoire":"Ivory Coast",
     "cape verde":"Cape Verde","cabo verde":"Cape Verde",
     "d-r congo":"DR Congo","dr congo":"DR Congo","d.r. congo":"DR Congo",
     "saudi arabia":"Saudi Arabia","new zealand":"New Zealand",
@@ -49,11 +49,18 @@ ALIASES = {
 
 def nteam(name):
     if not name: return name
-    name = name.strip()
+    # Strip flag emojis and non-ASCII, then normalize
+    name = re.sub(r"[^\x00-\x7F]+", "", name).strip()
+    # Strip trailing parentheticals like " (Round 1 - Group A)"
+    name = re.sub(r"\s*\(.*?\)\s*$", "", name).strip()
     return ALIASES.get(name.lower(), name)
 
 def mid(h, a):
-    return f"{nteam(h).lower().replace(' ','_')}_vs_{nteam(a).lower().replace(' ','_')}"
+    h2 = re.sub(r"[^\w]","_",nteam(h).lower())
+    a2 = re.sub(r"[^\w]","_",nteam(a).lower())
+    h2 = re.sub(r"_+","_",h2).strip("_")
+    a2 = re.sub(r"_+","_",a2).strip("_")
+    return f"{h2}_vs_{a2}"
 
 def pfromo(h,d,a):
     try:
@@ -92,13 +99,20 @@ def parse_betexplorer():
         if sm:
             s = sm.group(1).strip()
             for sep in [" vs "," - "," v "]:
-        if sm:
-            s = sm.group(1).strip()
-            for sep in [" vs "," - "," v "]:
                 if sep in s:
                     pts = s.split(sep,1)
-                    if len(pts)==2: ht,at = pts[0].strip(),pts[1].strip(); break
+                    if len(pts)==2:
+                        ht = pts[0].strip()
+                        at = pts[1].strip()
+                        break
         if not ht: continue
+        ds = re.search(r"DTSTART[^:]*:(\d{8})",ev)
+        dt = f"{ds.group(1)[:4]}-{ds.group(1)[4:6]}-{ds.group(1)[6:8]}" if ds else ""
+        gm = re.search(r"Group ([A-L])",t)
+        g = gm.group(1) if gm else ""
+        hp,dp,ap = pfromo(ho,do,ao)
+        ht,at = nteam(ht),nteam(at)
+        add(source="betexplorer",match_id=mid(ht,at),home_team=ht,away_team=at,
             group=g,date=dt,home_win_prob=hp,draw_prob=dp,away_win_prob=ap,
             home_win_odds=ho,draw_odds=do,away_win_odds=ao)
         c += 1
@@ -115,9 +129,8 @@ def parse_uanalyse():
             h,a = nteam(r.get("home_team","")),nteam(r.get("away_team",""))
             if not h or not a: continue
             st = r.get("stage",""); g = ""
-            m = re.search(r"Group ([A-L])",st)
-            if m: g = m.group(1)
-            add(source="uanalyse",match_id=mid(h,a),home_team=h,away_team=a,
+            m2 = re.search(r"Group ([A-L])",st)
+    p = RAW/"polymarket"/"fifa-wc-match-events.json"
                 group=g,date=r.get("kickoff_date",""),
                 home_win_prob=round(float(r.get("prob_home_win",0) or 0),6),
                 draw_prob=round(float(r.get("prob_draw",0) or 0),6),
@@ -138,27 +151,21 @@ def parse_wcpredictor():
             h,a = nteam(r.get("home_team","")),nteam(r.get("away_team",""))
             if not h or not a: continue
             add(source="worldcup-predictor",match_id=mid(h,a),home_team=h,away_team=a,
-                date=r.get("date",""),
-                home_win_prob=round(float(r.get("p_home",0) or 0),6),
-                draw_prob=round(float(r.get("p_draw",0) or 0),6),
-                away_win_prob=round(float(r.get("p_away",0) or 0),6),
-                extra={"elo_h":r.get("elo_home"),"elo_a":r.get("elo_away"),
-                       "neutral":r.get("neutral"),"city":r.get("city",""),
-                       "pick":r.get("pick","")})
-            c += 1
-    log("worldcup-predictor",c)
-
-# ── 4. Polymarket ─────────────────────────────────────────────────────
-def parse_polymarket():
-    print("\n--- Polymarket ---")
-    p = RAW/"polymarket"/"fifa-wc-match-events.json"
-    if not p.exists(): print("  [SKIP]"); return
-    with open(p) as f: events = json.load(f)
-    c = 0
-    for ev in events:
-        title = ev.get("title",""); et = title.lower()
-        if any(x in et for x in ["exact score","more markets","spread","o/u","over/under",
-                                  "both teams","team to advance","knockout"]): continue
+        hp = dp = ap = None
+        for m in ev.get("markets",[]):
+            q = m.get("question","").lower()
+            outs = m.get("outcomes",[])
+            prs = m.get("outcomePrices",[])
+            if len(outs)!=2 or len(prs)!=2: continue
+            try: yp = float(prs[0])
+            except: continue
+            if "end in a draw" in q: dp = yp
+            elif "will" in q and "win" in q:
+                tm = re.match(r"will (.+?) win on",q)
+                if tm:
+                    tn = tm.group(1).strip()
+                    if tn.lower() in ht.lower(): hp = yp
+                    elif tn.lower() in at.lower(): ap = yp
         ht = at = None
         for sep in [" vs. "," vs "," - "," @ "]:
             if sep in title:
@@ -210,10 +217,10 @@ def parse_openfootball():
         c += 1
     log("openfootball",c)
 
-# ── 6. FiveThirtyEight (tournament-level, no match rows) ──────────────
+# ── 6. FiveThirtyEight ────────────────────────────────────────────────
 def parse_fivethirtyeight():
     print("\n--- FiveThirtyEight ---")
-    print("  [INFO] Tournament-level data only — skipping")
+    print("  [INFO] Tournament-level data only — skipping match normalization")
     log("fivethirtyeight-2014",0)
 
 # ── 7. OddsHarvester ──────────────────────────────────────────────────

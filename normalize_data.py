@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""
-Normalize all raw World Cup 2026 odds data into a common schema.
-
-Output: _data/norm/all_odds_normalized.csv
-"""
+"""Normalize all raw World Cup 2026 odds data into a common schema."""
 
 import csv, json, re, sys
 from pathlib import Path
@@ -26,6 +22,7 @@ ALIASES = {
     "south korea":"South Korea","korea republic":"South Korea",
     "bosnia-herzegovina":"Bosnia and Herzegovina",
     "bosnia herzegovina":"Bosnia and Herzegovina",
+    "bosnia and herzegovina":"Bosnia and Herzegovina",
     "united states":"USA","usa":"USA",
     "turkiye":"Turkey","turkiye":"Turkey",
     "ivory coast":"Ivory Coast","cote d'ivoire":"Ivory Coast",
@@ -44,14 +41,11 @@ ALIASES = {
     "mexico":"Mexico","canada":"Canada","switzerland":"Switzerland",
     "austria":"Austria","croatia":"Croatia","scotland":"Scotland",
     "south africa":"South Africa","qatar":"Qatar","iraq":"Iraq",
-    "korea republic":"South Korea","czech":"Czech Republic",
 }
 
 def nteam(name):
     if not name: return name
-    # Strip flag emojis and non-ASCII, then normalize
     name = re.sub(r"[^\x00-\x7F]+", "", name).strip()
-    # Strip trailing parentheticals like " (Round 1 - Group A)"
     name = re.sub(r"\s*\(.*?\)\s*$", "", name).strip()
     return ALIASES.get(name.lower(), name)
 
@@ -79,7 +73,6 @@ def log(src, n):
     stats[src] = n
     print(f"  {src}: {n} rows")
 
-# ── 1. BetExplorer (ICS) ──────────────────────────────────────────────
 def parse_betexplorer():
     print("\n--- BetExplorer ---")
     p = RAW/"betexplorer"/"world-cup-calendar.ics"
@@ -101,10 +94,7 @@ def parse_betexplorer():
             for sep in [" vs "," - "," v "]:
                 if sep in s:
                     pts = s.split(sep,1)
-                    if len(pts)==2:
-                        ht = pts[0].strip()
-                        at = pts[1].strip()
-                        break
+                    if len(pts)==2: ht,at = pts[0].strip(),pts[1].strip(); break
         if not ht: continue
         ds = re.search(r"DTSTART[^:]*:(\d{8})",ev)
         dt = f"{ds.group(1)[:4]}-{ds.group(1)[4:6]}-{ds.group(1)[6:8]}" if ds else ""
@@ -118,7 +108,6 @@ def parse_betexplorer():
         c += 1
     log("betexplorer",c)
 
-# ── 2. uanalyse ───────────────────────────────────────────────────────
 def parse_uanalyse():
     print("\n--- uanalyse ---")
     p = RAW/"uanalyse"/"latest"/"match_predictions.csv"
@@ -130,7 +119,8 @@ def parse_uanalyse():
             if not h or not a: continue
             st = r.get("stage",""); g = ""
             m2 = re.search(r"Group ([A-L])",st)
-    p = RAW/"polymarket"/"fifa-wc-match-events.json"
+            if m2: g = m2.group(1)
+            add(source="uanalyse",match_id=mid(h,a),home_team=h,away_team=a,
                 group=g,date=r.get("kickoff_date",""),
                 home_win_prob=round(float(r.get("prob_home_win",0) or 0),6),
                 draw_prob=round(float(r.get("prob_draw",0) or 0),6),
@@ -140,7 +130,6 @@ def parse_uanalyse():
             c += 1
     log("uanalyse",c)
 
-# ── 3. worldcup-predictor ─────────────────────────────────────────────
 def parse_wcpredictor():
     print("\n--- worldcup-predictor ---")
     p = RAW/"worldcup-predictor"/"wc2026_predictions.csv"
@@ -151,21 +140,26 @@ def parse_wcpredictor():
             h,a = nteam(r.get("home_team","")),nteam(r.get("away_team",""))
             if not h or not a: continue
             add(source="worldcup-predictor",match_id=mid(h,a),home_team=h,away_team=a,
-        hp = dp = ap = None
-        for m in ev.get("markets",[]):
-            q = m.get("question","").lower()
-            outs = m.get("outcomes",[])
-            prs = m.get("outcomePrices",[])
-            if len(outs)!=2 or len(prs)!=2: continue
-            try: yp = float(prs[0])
-            except: continue
-            if "end in a draw" in q: dp = yp
-            elif "will" in q and "win" in q:
-                tm = re.match(r"will (.+?) win on",q)
-                if tm:
-                    tn = tm.group(1).strip()
-                    if tn.lower() in ht.lower(): hp = yp
-                    elif tn.lower() in at.lower(): ap = yp
+                date=r.get("date",""),
+                home_win_prob=round(float(r.get("p_home",0) or 0),6),
+                draw_prob=round(float(r.get("p_draw",0) or 0),6),
+                away_win_prob=round(float(r.get("p_away",0) or 0),6),
+                extra={"elo_h":r.get("elo_home"),"elo_a":r.get("elo_away"),
+                       "neutral":r.get("neutral"),"city":r.get("city",""),
+                       "pick":r.get("pick","")})
+            c += 1
+    log("worldcup-predictor",c)
+
+def parse_polymarket():
+    print("\n--- Polymarket ---")
+    p = RAW/"polymarket"/"fifa-wc-match-events-fixed.json"
+    if not p.exists(): print("  [SKIP]"); return
+    with open(p) as f: events = json.load(f)
+    c = 0
+    for ev in events:
+        title = ev.get("title",""); et = title.lower()
+        if any(x in et for x in ["exact score","more markets","spread","o/u","over/under",
+                                  "both teams","team to advance","knockout"]): continue
         ht = at = None
         for sep in [" vs. "," vs "," - "," @ "]:
             if sep in title:
@@ -177,6 +171,13 @@ def parse_wcpredictor():
             q = m.get("question","").lower()
             outs = m.get("outcomes",[])
             prs = m.get("outcomePrices",[])
+            # Handle both list and stringified-list formats
+            if isinstance(outs, str):
+                try: outs = json.loads(outs)
+                except: continue
+            if isinstance(prs, str):
+                try: prs = json.loads(prs)
+                except: continue
             if len(outs)!=2 or len(prs)!=2: continue
             try: yp = float(prs[0])
             except: continue
@@ -184,9 +185,10 @@ def parse_wcpredictor():
             elif "will" in q and "win" in q:
                 tm = re.match(r"will (.+?) win on",q)
                 if tm:
-                    tn = tm.group(1).strip()
-                    if tn.lower() in ht.lower(): hp = yp
-                    elif tn.lower() in at.lower(): ap = yp
+                    tn = tm.group(1).strip().lower()
+                    # Fuzzy match: check if team name is substring of home/away
+                    if tn in ht.lower() or ht.lower() in tn: hp = yp
+                    elif tn in at.lower() or at.lower() in tn: ap = yp
         ht,at = nteam(ht),nteam(at)
         ds = ev.get("startDate","")[:10] if ev.get("startDate") else ""
         add(source="polymarket",match_id=mid(ht,at),home_team=ht,away_team=at,
@@ -198,7 +200,6 @@ def parse_wcpredictor():
         c += 1
     log("polymarket",c)
 
-# ── 5. openfootball ───────────────────────────────────────────────────
 def parse_openfootball():
     print("\n--- openfootball ---")
     p = RAW/"openfootball"/"worldcup-2026.json"
@@ -217,13 +218,11 @@ def parse_openfootball():
         c += 1
     log("openfootball",c)
 
-# ── 6. FiveThirtyEight ────────────────────────────────────────────────
 def parse_fivethirtyeight():
     print("\n--- FiveThirtyEight ---")
-    print("  [INFO] Tournament-level data only — skipping match normalization")
+    print("  [INFO] Tournament-level data only — skipping")
     log("fivethirtyeight-2014",0)
 
-# ── 7. OddsHarvester ──────────────────────────────────────────────────
 def parse_oddsharvester():
     print("\n--- OddsHarvester ---")
     cp = RAW/"oddsharvester"/"worldcup-2026-odds.csv"
@@ -258,7 +257,6 @@ def parse_oddsharvester():
             c += 1
     log("oddsharvester",c)
 
-# ── Write ─────────────────────────────────────────────────────────────
 def write_output():
     print("\n--- Writing ---")
     op = NORM/"all_odds_normalized.csv"

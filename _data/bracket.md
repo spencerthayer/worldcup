@@ -2,7 +2,7 @@
 
 **Generated:** 2026-06-11T18:57:51.409695+00:00
 
-**Model:** consensus | **Sims:** 50,000 | **Seed:** 42
+**Model:** consensus | **Sims:** 500,000 | **Seed:** 42
 
 **Expected Score:** 97.54 / 203
 

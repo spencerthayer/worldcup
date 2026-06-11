@@ -38,7 +38,7 @@ A complete pipeline for scraping World Cup odds from multiple open sources, norm
 ## Quick start
 
 ```bash
-# 1. Install dependencies
+# 1. Install scraper dependencies, only needed when refreshing raw data
 pip install playwright
 python3 -m playwright install chromium
 
@@ -57,8 +57,8 @@ cat _data/bracket.md
 
 | Metric | Value |
 |---|---|
-| **Expected Score** | **93.23 / 203** |
-| **Champion** | **Argentina** (15.1%) |
+| **Expected Score** | **97.54 / 203** |
+| **Champion** | **Spain** (16.8%) |
 | **Final** | Argentina vs Spain |
 
 Top champion probabilities: Spain 16.8%, Argentina 15.1%, France 12.7%, Brazil 8.5%, England 7.9%.
@@ -198,7 +198,7 @@ $$+ 15 \cdot P(B_{\text{winner}} \text{ wins tournament})$$
 
 **Group placements** are optimized by brute force over all $4! = 24$ permutations per group, picking the ordering that maximizes expected placement points.
 
-**Knockout picks** are filled deterministically: optimized group seeds are placed into the bracket skeleton, third-place teams are assigned via backtracking, and each knockout match is decided by the team with higher advancement probability. The picks are constrained to be nested: $\text{Winner} \subset \text{Finalists} \subset \text{SF} \subset \text{QF} \subset \text{R16} \subset \text{R32}$.
+**Knockout picks** are filled deterministically: optimized group seeds are placed into the bracket skeleton, third-place teams are assigned via backtracking, and a bracket-tree dynamic program chooses the feasible set of winners that maximizes expected stage points. This is different from simply choosing the team with higher one-match advancement probability. The picks are constrained to be nested: $\text{Winner} \subset \text{Finalists} \subset \text{SF} \subset \text{QF} \subset \text{R16} \subset \text{R32}$.
 
 ---
 
@@ -206,29 +206,43 @@ $$+ 15 \cdot P(B_{\text{winner}} \text{ wins tournament})$$
 
 ```bash
 python3 generate_bracket.py \
-  --sims 50000 \        # Number of Monte Carlo iterations (default: 50000)
-  --seed 42 \           # Random seed for reproducibility (default: 42)
-  --model consensus \   # Probability model: consensus, elo, poisson (default: consensus)
-  --strategy ev-bracket \ # Optimization: ev-bracket, greedy (default: ev-bracket)
-  --probabilities sim \ # Probability source: sim, blend (default: sim)
-  --out _data/bracket \ # Output path stem (default: _data/bracket)
-  --formats csv,json,md \ # Output formats (default: all three)
-  --dry-run             # Validate data without simulating
+  --sims 50000 \
+  --seed 42 \
+  --model consensus \
+  --strategy ev-bracket \
+  --probabilities sim \
+  --out _data/bracket \
+  --formats csv,json,md
 ```
+
+Current CLI behavior:
+
+| Option | Supported now | Notes |
+|---|---|---|
+| `--sims` | yes | Number of Monte Carlo iterations; default `50000` |
+| `--seed` | yes | Random seed for reproducibility; default `42` |
+| `--model consensus` | yes | Uses merged priced group-stage sources, Elo fallback for unpriced pairings |
+| `--model elo` | yes | Forces Elo model for all matchups |
+| `--model poisson` | no | Parsed for future work; currently exits with an explicit error |
+| `--strategy ev-bracket` | yes | Deterministic expected-points bracket fill |
+| `--strategy greedy` | no | Parsed for future work; currently exits with an explicit error |
+| `--probabilities sim` | yes | Optimizes using Monte Carlo probabilities |
+| `--probabilities blend` | yes | Blends simulation with UAnalyse priors before optimization/output |
+| `--out` | yes | Output path stem; default `_data/bracket` |
+| `--formats` | yes | Comma-separated output formats; default `csv,json,md` |
+| `--dry-run` | yes | Loads and validates inputs without simulating |
 
 ---
 
 ## Odds data sources
 
-The analysis currently uses one source (average BetExplorer 1X2 odds from the ICS calendar).
-Below are additional **open / free / publicly accessible** sources for World Cup match odds
-you can integrate to improve coverage, cross-reference bookmakers, or build a consensus model.
+The analysis now uses the normalized multi-source consensus from `_data/norm/all_odds_normalized.csv`, not only the legacy BetExplorer ICS feed. The sources below are the current inputs and additional open/free/publicly accessible sources that can improve coverage or calibration.
 
 ### Free APIs (no cost, no/low auth)
 
 | Source | Type | Coverage | Notes |
 |---|---|---|---|
-| [BetExplorer](https://www.betexplorer.com/) | Web scrape / ICS embed | 1X2 odds from 30+ bookmakers averaged per match | The current source. Odds are embedded in the kubeia.io ICS calendar. Also available as a web scraper via OddsHarvester or direct page scrape. |
+| [BetExplorer](https://www.betexplorer.com/) | Web scrape / ICS embed | 1X2 odds from 30+ bookmakers averaged per match | Current normalized source. Odds are embedded in the kubeia.io ICS calendar. Also available as a web scraper via OddsHarvester or direct page scrape. |
 | [BALLDONTLIE FIFA API](https://fifa.balldontlie.io/) | REST API (JSON) | 2018, 2022, 2026 tournaments | Free API key; includes moneyline, spread, total odds from FanDuel, DraftKings, etc. Cursor-based pagination. |
 | [The Odds API](https://the-odds-api.com/) | REST API (JSON) | ~40 bookmakers (Bet365, DraftKings, FanDuel, William Hill…) | 500 free credits/mo. Covers 1X2, spreads, totals. No Pinnacle / Betfair. SDKs on GitHub under Apache-2.0. |
 | [OddsPapi](https://oddspapi.io/) | REST API (JSON) | 350+ bookmakers (incl. Pinnacle, Singbet, Betfair Exchange) | 250 free requests/mo. Each request returns all bookmakers. Historical odds included. |

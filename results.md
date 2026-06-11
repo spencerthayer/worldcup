@@ -1,30 +1,30 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Expected Score: 72.20 / 203** (35.6% of max)
+**Expected Score: 94.99 / 203** (46.8% of max)
 
 ## 🎯 Summary
 
 - 👑 **Champion:** 🇪🇸 Spain (16.9%)
 - 🌟 **Final:** 🇦🇷 Argentina vs 🇪🇸 Spain
-- 📊 **Expected Points:** 72.20 / 203
+- 📊 **Expected Points:** 94.99 / 203
 - 🎲 **Simulations:** 1,000,000 | **Seed:** 42
 
 ## 📊 Group Placements
 
 | Group | 1st | 2nd | 3rd | 4th |
 |:---:|:---:|:---:|:---:|:---:|
-| **A** | 🇲🇽 Mexico (0.0%) | 🇰🇷 South Korea (0.0%) | 🇨🇿 Czech Republic (0.0%) | 🇿🇦 South Africa (0.0%) |
-| **B** | 🇨🇭 Switzerland (0.0%) | 🇨🇦 Canada (0.0%) | 🇧🇦 Bosnia and Herzegovina (0.0%) | 🇶🇦 Qatar (0.0%) |
-| **C** | 🇧🇷 Brazil (0.0%) | 🇲🇦 Morocco (0.0%) | 🏴󠁧󠁢󠁳󣯿 Scotland (0.0%) | 🇭🇹 Haiti (0.0%) |
-| **D** | 🇹🇷 Turkey (0.0%) | 🇺🇸 USA (0.0%) | 🇵🇾 Paraguay (0.0%) | 🇦🇺 Australia (0.0%) |
-| **E** | 🇩🇪 Germany (0.0%) | 🇪🇨 Ecuador (0.0%) | 🇨🇮 Ivory Coast (0.0%) | 🇨🇼 Curaçao (0.0%) |
-| **F** | 🇳🇱 Netherlands (0.0%) | 🇯🇵 Japan (0.0%) | 🇸🇪 Sweden (0.0%) | 🇹🇳 Tunisia (0.0%) |
-| **G** | 🇧🇪 Belgium (0.0%) | 🇪🇬 Egypt (0.0%) | 🇮🇷 Iran (0.0%) | 🇳🇿 New Zealand (0.0%) |
-| **H** | 🇪🇸 Spain (0.0%) | 🇺🇾 Uruguay (0.0%) | 🇸🇦 Saudi Arabia (0.0%) | 🇨🇻 Cape Verde (0.0%) |
-| **I** | 🇫🇷 France (0.0%) | 🇳🇴 Norway (0.0%) | 🇸🇳 Senegal (0.0%) | 🇮🇶 Iraq (0.0%) |
-| **J** | 🇦🇷 Argentina (0.0%) | 🇦🇹 Austria (0.0%) | 🇩🇿 Algeria (0.0%) | 🇯🇴 Jordan (0.0%) |
-| **K** | 🇵🇹 Portugal (0.0%) | 🇨🇴 Colombia (0.0%) | 🇨🇩 DR Congo (0.0%) | 🇺🇿 Uzbekistan (0.0%) |
-| **L** | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England (0.0%) | 🇭🇷 Croatia (0.0%) | 🇬🇭 Ghana (0.0%) | 🇵🇦 Panama (0.0%) |
+| **A** | 🇲🇽 Mexico (53.8%) | 🇰🇷 South Korea (29.9%) | 🇨🇿 Czech Republic (30.1%) | 🇿🇦 South Africa (49.9%) |
+| **B** | 🇨🇭 Switzerland (51.0%) | 🇨🇦 Canada (37.9%) | 🇧🇦 Bosnia and Herzegovina (42.8%) | 🇶🇦 Qatar (66.8%) |
+| **C** | 🇧🇷 Brazil (63.4%) | 🇲🇦 Morocco (40.9%) | 🏴󠁧󠁢󠁳󣯿 Scotland (41.4%) | 🇭🇹 Haiti (67.9%) |
+| **D** | 🇹🇷 Turkey (35.1%) | 🇺🇸 USA (28.2%) | 🇵🇾 Paraguay (28.2%) | 🇦🇺 Australia (42.3%) |
+| **E** | 🇩🇪 Germany (59.3%) | 🇪🇨 Ecuador (40.3%) | 🇨🇮 Ivory Coast (45.9%) | 🇨🇼 Curaçao (81.7%) |
+| **F** | 🇳🇱 Netherlands (49.0%) | 🇯🇵 Japan (33.0%) | 🇸🇪 Sweden (33.0%) | 🇹🇳 Tunisia (50.9%) |
+| **G** | 🇧🇪 Belgium (62.3%) | 🇪🇬 Egypt (32.5%) | 🇮🇷 Iran (32.8%) | 🇳🇿 New Zealand (57.8%) |
+| **H** | 🇪🇸 Spain (71.9%) | 🇺🇾 Uruguay (50.9%) | 🇸🇦 Saudi Arabia (37.9%) | 🇨🇻 Cape Verde (46.2%) |
+| **I** | 🇫🇷 France (59.8%) | 🇳🇴 Norway (38.1%) | 🇸🇳 Senegal (40.9%) | 🇮🇶 Iraq (72.7%) |
+| **J** | 🇦🇷 Argentina (67.1%) | 🇦🇹 Austria (38.0%) | 🇩🇿 Algeria (37.7%) | 🇯🇴 Jordan (63.8%) |
+| **K** | 🇵🇹 Portugal (53.5%) | 🇨🇴 Colombia (40.4%) | 🇨🇩 DR Congo (37.2%) | 🇺🇿 Uzbekistan (46.0%) |
+| **L** | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England (63.4%) | 🇭🇷 Croatia (42.9%) | 🇬🇭 Ghana (36.5%) | 🇵🇦 Panama (46.1%) |
 
 ## 🏆 Knockout Bracket
 
@@ -131,14 +131,14 @@
 
 | Stage | Picks | Pts/Pick | Max | Expected | % of Max |
 |:---|:---:|:---:|:---:|:---:|:---:|
-| Group Placement | 48 | 1 | 48 | **0.00** | 0.0% |
+| Group Placement | 48 | 1 | 48 | **22.79** | 47.5% |
 | Round Of 32 | 32 | 1 | 32 | **26.46** | 82.7% |
 | Round Of 16 | 16 | 2 | 32 | **18.35** | 57.3% |
 | Quarter Finals | 8 | 4 | 32 | **14.07** | 44.0% |
 | Semi Finals | 4 | 6 | 24 | **8.28** | 34.5% |
 | Finalists | 2 | 10 | 20 | **5.04** | 25.2% |
 | Winner | 5 | 15 | 75 | **0.00** | 0.0% |
-| **Total** | | | **203** | **72.20** | 35.6% |
+| **Total** | | | **203** | **94.99** | 46.8% |
 
 ## ⚙️ Simulation Config
 
@@ -148,7 +148,7 @@
 - **Strategy:** ev-bracket
 - **Probabilities:** sim
 - **Simulation accuracy:** ±0.050% (SE bound at p=0.5)
-- **Generated:** 2026-06-11T19:21:10.025367+00:00
+- **Generated:** 2026-06-11T20:44:44.302977+00:00
 
 ### ✅ All Invariants Passed
 

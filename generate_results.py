@@ -26,7 +26,7 @@ FLAGS = {
     "Iraq": "🇮🇶", "Ivory Coast": "🇨🇮", "Japan": "🇯🇵", "Jordan": "🇯🇴",
     "Mexico": "🇲🇽", "Morocco": "🇲🇦", "Netherlands": "🇳🇱", "New Zealand": "🇳🇿",
     "Norway": "🇳🇴", "Panama": "🇵🇦", "Paraguay": "🇵🇾", "Portugal": "🇵🇹",
-    "Qatar": "🇶🇦", "Saudi Arabia": "🇸🇦", "Scotland": "🏴󠁧󠁢󠁳󣯿",
+    "Qatar": "🇶🇦", "Saudi Arabia": "🇸🇦", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
     "Senegal": "🇸🇳", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Spain": "🇪🇸",
     "Sweden": "🇸🇪", "Switzerland": "🇨🇭", "Tunisia": "🇹🇳", "Turkey": "🇹🇷",
     "USA": "🇺🇸", "Uruguay": "🇺🇾", "Uzbekistan": "🇺🇿",
@@ -142,17 +142,17 @@ def render_knockout_bracket(bracket, per_team_probs):
 
     if winner:
         lines.append(f"### 👑 Champion: {flag(winner)} {winner}\n")
-
-    return lines
-
-
-def render_champion_probabilities(per_team_probs, top_n=15):
-    lines = []
-    lines.append("## 🏅 Champion Probabilities\n")
-    lines.append("| Rank | Team | Probability |")
-    lines.append("|:---:|:---:|:---:|")
-    champs = sorted(per_team_probs.items(), key=lambda x: -x[1].get("champion", 0))
-    for i, (team, probs) in enumerate(champs[:top_n], 1):
+    for stage, key in stage_key.items():
+        if stage == "winner":
+            w = bracket.get("winner", "")
+            picks = [w] if w else []
+        else:
+            picks = bracket.get(stage, [])
+        points = STAGE_POINTS[stage]
+        stage_score = sum(per_team_probs.get(t, {}).get(key, 0) * points for t in picks)
+        total += stage_score
+        max_pts = len(picks) * points
+        rows.append((stage.replace("_", " ").title(), len(picks), points, max_pts, stage_score))
         p = probs.get("champion", 0)
         if p > 0:
             medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
@@ -183,7 +183,11 @@ def render_stage_breakdown(bracket, per_team_probs):
         "finalists": "final", "winner": "champion",
     }
     for stage, key in stage_key.items():
-        picks = bracket.get(stage, [])
+        if stage == "winner":
+            w = bracket.get("winner", "")
+            picks = [w] if w else []
+        else:
+            picks = bracket.get(stage, [])
         points = STAGE_POINTS[stage]
         stage_score = sum(per_team_probs.get(t, {}).get(key, 0) * points for t in picks)
         total += stage_score

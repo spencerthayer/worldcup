@@ -383,24 +383,53 @@ python3 update_results.py -m Mexico_vs_South_Africa -s 2 1
 python3 generate_results.py
 ```
 
-### What the results page shows
+### Partial group handling
 
-- **Expected Score**: probability-weighted points for all picks (e.g. 97.53 / 203). This is computed at bracket-generation time. Higher is better; it is the model's ex-ante estimate of how many points the bracket is worth.
-- **Actual Score**: points earned so far from correct predictions against real results. Starts at 0 and increases as matches are played.
-- **Accuracy**: fraction of resolved predictions that were correct (e.g. 37/91 = 40.7%).
-- **Group tables**: each group shows predicted vs actual placement, with ✅ (correct), ❌ (wrong), ⏳ (pending — not enough matches played to determine final position), or 🟰 (tie — teams are level on points and the tie has not been broken yet).
-- **Per-stage points breakdown**: shows correct/total and points earned for each stage:
-  - Group Placement: +1pt per correct
-  - Advance to Knockout: +1pt per correct
-  - Advance to Round of 16: +2pts per correct
-  - Advance to Quarter-Finals: +4pts per correct
-  - Advance to Semi-Finals: +6pts per correct
-  - Finalist: +10pts per correct
-  - Winner: +15pts
+Groups are updated **one match at a time** as results come in. You do not need to wait for all 6 matches in a group to be played:
 
-### How ties are resolved
+- **Not started** (⏳): No matches played yet. Teams shown in alphabetical order with 0 pts.
+- **In progress** (🔴): Some but not all matches played. Table shows current standings (Pts, GD, Pld) with 🔴 projected markers. Upcoming matches listed below.
+- **Complete** (✅/❌): All 6 matches played. Final positions locked in with ✅ (correct) or ❌ (wrong) markers. Points are earned.
 
-When two or more teams are level on points after all group matches are played, they appear with a 🟰 marker. The current tie-breaker in the code is goal difference, then goals scored. Once enough matches are played to break the tie, the table updates to show the final ranking with ✅ or ❌ per position.
+Example — Group A with 1 of 6 matches played:
+
+```
+### Group A — 🔴 1/6 matches played
+
+| Pos | Predicted | Actual | Pts | GD | Pld | Result |
+| 1st | 🇲🇽 Mexico | 🇲🇽 Mexico | 3 | +1 | 1 | 🔴 (projected) |
+| 2nd | 🇰🇷 South Korea | 🇰🇷 South Korea | 0 | 0 | 0 | 🔴 (projected) |
+...
+
+**Upcoming:**
+  - 2026-06-11 20:00 UTC-6: 🇰🇷 South Korea vs 🇨🇿 Czech Republic
+  - 2026-06-18 12:00 UTC-4: 🇨🇿 Czech Republic vs 🇿🇦 South Africa
+  ...
+```
+
+After each match, re-run `python3 generate_results.py` and the table updates instantly.
+
+### Scoring
+
+Points are only earned when a pick is **fully resolved**:
+
+| Stage | Points | When scored |
+|---|---:|---|
+| Group Placement | +1 per correct position | Only when ALL 6 group matches are played |
+| Advance to Knockout | +1 per correct team | Only when ALL groups are complete |
+| Advance to R16 | +2 per correct team | When R16 matches are played |
+| Advance to QF | +4 per correct team | When QF matches are played |
+| Advance to SF | +6 per correct team | When SF matches are played |
+| Finalist | +10 per correct team | When Final is played |
+| Winner | +15 | When Champion is determined |
+
+Until a stage is resolved, its picks show as **pending** and contribute 0 to the actual score.
+
+### Expected vs Actual score
+
+- **Expected Score** (e.g. 97.53 / 203): Computed at bracket-generation time. Sum of `P(correct) × points` for all 111 picks. This is the model's ex-ante estimate and does not change as matches are played.
+- **Actual Score** (e.g. 1 / 203): Points earned from correct predictions against real results. Starts at 0 and increases as matches are played. Maximum is 203 (perfect bracket).
+- **Accuracy**: Fraction of resolved predictions that were correct (e.g. 1/4 = 25%).
 
 ### Data files
 

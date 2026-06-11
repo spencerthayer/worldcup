@@ -1,30 +1,139 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Expected Score: 97.53 / 203** (48.0% of max)
+**Last updated:** 2026-06-11T21:14:51.669666+00:00
 
 ## 🎯 Summary
 
-- 👑 **Champion:** 🇪🇸 Spain (16.9%)
-- 🌟 **Final:** 🇦🇷 Argentina vs 🇪🇸 Spain
-- 📊 **Expected Points:** 97.53 / 203
-- 🎲 **Simulations:** 1,000,000 | **Seed:** 42
+- 👑 **Predicted Champion:** 🇪🇸 Spain (16.9%)
+- 🌟 **Predicted Final:** 🇦🇷 Argentina vs 🇪🇸 Spain
+- 📊 **Expected Score:** 97.53 / 203
+
+## 📈 Scoring Summary
+
+**Current Score: 37 / 203 (18.2%)**
+
+**Accuracy: 37/91 correct (40.7%)**
+
+| Stage | Correct | Pts/Pick | Max | Pts Earned |
+|:---|:---:|:---:|:---:|:---:|
+| Group Placement | 16/48 | 1 | 48 | **16** |
+| Advance to Knockout | 21/32 | 1 | 32 | **21** |
+| Advance to R16 | 0/0 (+16 pending) | 2 | 32 | **0** |
+| Advance to QF | 0/0 (+8 pending) | 4 | 32 | **0** |
+| Advance to SF | 0/0 (+4 pending) | 6 | 24 | **0** |
+| Finalist | 0/0 (+2 pending) | 10 | 20 | **0** |
+| Winner | 0/0 (+5 pending) | 15 | 15 | **0** |
+| **Total** | | | **203** | **37** |
 
 ## 📊 Group Placements
 
-| Group | 1st | 2nd | 3rd | 4th |
-|:---:|:---:|:---:|:---:|:---:|
-| **A** | 🇲🇽 Mexico (53.8%) | 🇰🇷 South Korea (29.9%) | 🇨🇿 Czech Republic (30.1%) | 🇿🇦 South Africa (49.9%) |
-| **B** | 🇨🇭 Switzerland (51.0%) | 🇨🇦 Canada (37.9%) | 🇧🇦 Bosnia and Herzegovina (42.8%) | 🇶🇦 Qatar (66.8%) |
-| **C** | 🇧🇷 Brazil (63.4%) | 🇲🇦 Morocco (40.9%) | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland (41.4%) | 🇭🇹 Haiti (67.9%) |
-| **D** | 🇹🇷 Turkey (35.1%) | 🇺🇸 USA (28.2%) | 🇵🇾 Paraguay (28.2%) | 🇦🇺 Australia (42.3%) |
-| **E** | 🇩🇪 Germany (59.3%) | 🇪🇨 Ecuador (40.3%) | 🇨🇮 Ivory Coast (45.9%) | 🇨🇼 Curaçao (81.7%) |
-| **F** | 🇳🇱 Netherlands (49.0%) | 🇯🇵 Japan (33.0%) | 🇸🇪 Sweden (33.0%) | 🇹🇳 Tunisia (50.9%) |
-| **G** | 🇧🇪 Belgium (62.3%) | 🇪🇬 Egypt (32.5%) | 🇮🇷 Iran (32.8%) | 🇳🇿 New Zealand (57.8%) |
-| **H** | 🇪🇸 Spain (71.9%) | 🇺🇾 Uruguay (50.9%) | 🇸🇦 Saudi Arabia (37.9%) | 🇨🇻 Cape Verde (46.2%) |
-| **I** | 🇫🇷 France (59.8%) | 🇳🇴 Norway (38.1%) | 🇸🇳 Senegal (40.9%) | 🇮🇶 Iraq (72.7%) |
-| **J** | 🇦🇷 Argentina (67.1%) | 🇦🇹 Austria (38.0%) | 🇩🇿 Algeria (37.7%) | 🇯🇴 Jordan (63.8%) |
-| **K** | 🇵🇹 Portugal (53.5%) | 🇨🇴 Colombia (40.4%) | 🇨🇩 DR Congo (37.2%) | 🇺🇿 Uzbekistan (46.0%) |
-| **L** | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England (63.4%) | 🇭🇷 Croatia (42.9%) | 🇬🇭 Ghana (36.5%) | 🇵🇦 Panama (46.1%) |
+### Group A
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇲🇽 Mexico | 🇲🇽 Mexico | 9 | +6 | ✅ |
+| 2nd | 🇰🇷 South Korea | 🇨🇿 Czech Republic | 4 | 0 | ❌ |
+| 3rd | 🇨🇿 Czech Republic | 🇿🇦 South Africa | 3 | -1 | ❌ |
+| 4th | 🇿🇦 South Africa | 🇰🇷 South Korea | 1 | -5 | ❌ |
+
+### Group B
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇨🇭 Switzerland | — | — | — | ⏳ |
+| 2nd | 🇨🇦 Canada | — | — | — | ⏳ |
+| 3rd | 🇧🇦 Bosnia and Herzegovina | — | — | — | ⏳ |
+| 4th | 🇶🇦 Qatar | — | — | — | ⏳ |
+
+### Group C
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇧🇷 Brazil | — | — | — | ⏳ |
+| 2nd | 🇲🇦 Morocco | — | — | — | ⏳ |
+| 3rd | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland | — | — | — | ⏳ |
+| 4th | 🇭🇹 Haiti | — | — | — | ⏳ |
+
+### Group D
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇹🇷 Turkey | — | — | — | ⏳ |
+| 2nd | 🇺🇸 USA | — | — | — | ⏳ |
+| 3rd | 🇵🇾 Paraguay | — | — | — | ⏳ |
+| 4th | 🇦🇺 Australia | — | — | — | ⏳ |
+
+### Group E
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇩🇪 Germany | — | — | — | ⏳ |
+| 2nd | 🇪🇨 Ecuador | — | — | — | ⏳ |
+| 3rd | 🇨🇮 Ivory Coast | — | — | — | ⏳ |
+| 4th | 🇨🇼 Curaçao | — | — | — | ⏳ |
+
+### Group F
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇳🇱 Netherlands | — | — | — | ⏳ |
+| 2nd | 🇯🇵 Japan | — | — | — | ⏳ |
+| 3rd | 🇸🇪 Sweden | — | — | — | ⏳ |
+| 4th | 🇹🇳 Tunisia | — | — | — | ⏳ |
+
+### Group G
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇧🇪 Belgium | — | — | — | ⏳ |
+| 2nd | 🇪🇬 Egypt | — | — | — | ⏳ |
+| 3rd | 🇮🇷 Iran | — | — | — | ⏳ |
+| 4th | 🇳🇿 New Zealand | — | — | — | ⏳ |
+
+### Group H
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇪🇸 Spain | — | — | — | ⏳ |
+| 2nd | 🇺🇾 Uruguay | — | — | — | ⏳ |
+| 3rd | 🇸🇦 Saudi Arabia | — | — | — | ⏳ |
+| 4th | 🇨🇻 Cape Verde | — | — | — | ⏳ |
+
+### Group I
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇫🇷 France | — | — | — | ⏳ |
+| 2nd | 🇳🇴 Norway | — | — | — | ⏳ |
+| 3rd | 🇸🇳 Senegal | — | — | — | ⏳ |
+| 4th | 🇮🇶 Iraq | — | — | — | ⏳ |
+
+### Group J
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇦🇷 Argentina | — | — | — | ⏳ |
+| 2nd | 🇦🇹 Austria | — | — | — | ⏳ |
+| 3rd | 🇩🇿 Algeria | — | — | — | ⏳ |
+| 4th | 🇯🇴 Jordan | — | — | — | ⏳ |
+
+### Group K
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🇵🇹 Portugal | — | — | — | ⏳ |
+| 2nd | 🇨🇴 Colombia | — | — | — | ⏳ |
+| 3rd | 🇨🇩 DR Congo | — | — | — | ⏳ |
+| 4th | 🇺🇿 Uzbekistan | — | — | — | ⏳ |
+
+### Group L
+
+| Pos | Predicted | Actual | Pts | GD | Result |
+|:---:|:---|:---|:---:|:---:|:---:|
+| 1st | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England | — | — | — | ⏳ |
+| 2nd | 🇭🇷 Croatia | — | — | — | ⏳ |
+| 3rd | 🇬🇭 Ghana | — | — | — | ⏳ |
+| 4th | 🇵🇦 Panama | — | — | — | ⏳ |
 
 ## 🏆 Knockout Bracket
 
@@ -127,27 +236,14 @@
 | 14. | 🇺🇾 Uruguay | 1.7% |
 | 15. | 🇲🇽 Mexico | 1.6% |
 
-## 📈 Expected Points Breakdown
-
-| Stage | Picks | Pts/Pick | Max | Expected | % of Max |
-|:---|:---:|:---:|:---:|:---:|:---:|
-| Group Placement | 48 | 1 | 48 | **22.79** | 47.5% |
-| Round Of 32 | 32 | 1 | 32 | **26.46** | 82.7% |
-| Round Of 16 | 16 | 2 | 32 | **18.35** | 57.3% |
-| Quarter Finals | 8 | 4 | 32 | **14.07** | 44.0% |
-| Semi Finals | 4 | 6 | 24 | **8.28** | 34.5% |
-| Finalists | 2 | 10 | 20 | **5.04** | 25.2% |
-| Winner | 1 | 15 | 15 | **2.54** | 16.9% |
-| **Total** | | | **203** | **97.53** | 48.0% |
-
 ## ⚙️ Simulation Config
 
 - **Model:** consensus
 - **Simulations:** 1,000,000
 - **Seed:** 42
+- **Simulation accuracy:** ±0.05% (SE bound at p=0.5)
 - **Strategy:** ev-bracket
 - **Probabilities:** sim
-- **Simulation accuracy:** ±0.050% (SE bound at p=0.5)
 - **Generated:** 2026-06-11T20:44:44.302977+00:00
 
 ### ✅ All Invariants Passed

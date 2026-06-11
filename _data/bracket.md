@@ -1,6 +1,6 @@
 # 2026 World Cup Bracket Analysis
 
-**Generated:** 2026-06-11T18:43:42.241367+00:00
+**Generated:** 2026-06-11T18:47:03.560340+00:00
 
 **Model:** consensus | **Sims:** 50,000 | **Seed:** 42
 

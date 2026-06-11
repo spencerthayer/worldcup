@@ -803,3 +803,99 @@ as champion. Treat that as a regression smoke test, not as a required hard-coded
 answer. If the final implementation changes because of better third-place
 allocation, Poisson tie-breakers, or probability blending, explain the delta in
 the generated report.
+
+---
+
+## 16. Implementation Work Log (2026-06-11)
+
+### What was built
+
+`generate_bracket.py` - a single-file Python script (~440 lines) that implements the full bracket generator per this spec.
+
+### Architecture
+
+Single-file implementation (did not need to split into multiple modules):
+
+| Component | Lines | Purpose |
+|---|---|---|
+| Data loading | ~80 | Load normalized odds, fixtures, Elo ratings, xG, tournament priors |
+| Team canonicalization | ~15 | nteam() function with 70+ aliases covering all variant names |
+| Consensus model | ~40 | build_consensus() - weighted average of 5 sources, aligned to sorted match keys |
+| Elo fallback | ~10 | elo_probs() - standard Elo with draw probability clamped to [0.18, 0.30] |
+| Match simulation | ~15 | match_probs(), advance_prob() with shootout advantage |
+| Score synthesis | ~10 | synth_score() - draw scores, win margin via Bernoulli |
+| Group ranking | ~10 | rank_group() - points, GD, GS, Elo, random tie-breaker |
+| Third-place assignment | ~25 | assign_thirds() - backtracking with most-constrained-first ordering |
+| Knockout processing | ~30 | _process_knockout() - shared by simulate and fill_knockout_bracket |
+| Monte Carlo | ~50 | simulate() - full group + knockout simulation with indicator recording |
+| Optimization | ~15 | optimize_groups() brute force; fill_knockout_bracket() deterministic |
+| Validation | ~25 | validate() - all invariants from spec section 14 |
+| Rendering | ~80 | JSON, CSV, Markdown output from single result object |
+| CLI | ~30 | argparse with all options from spec section 12 |
+
+### Key design decisions
+
+1. **Backtracking third-place assignment**: The greedy approach failed to find complete assignments because 8 qualified third-place teams couldn't cover all 8 slots in fixed order. Full backtracking guarantees valid assignment.
+
+2. **Shared knockout processing**: _process_knockout() helper used by both simulate() and fill_knockout_bracket() for consistent slot resolution.
+
+3. **Final match handling**: parse_bracket() includes all non-group matches (not just those with num). _process_knockout() handles num is None by checking round field.
+
+4. **Group key normalization**: parse_bracket() strips "Group " prefix so knockout slot references match seed keys directly.
+
+5. **Single RNG seed**: Both simulate() and fill_knockout_bracket() use random.Random(seed) independently for deterministic output.
+
+### Results (50000 simulations, seed=42)
+
+**Expected Score: 93.23 / 203**
+**Winner: Argentina**
+**Finalists: Argentina vs Spain**
+
+MAD vs UAnalyse Priors:
+
+| Stage | MAD |
+|---|---|
+| R32 | 0.0626 |
+| QF | 0.0390 |
+| SF | 0.0259 |
+| Final | 0.0152 |
+| Champion | 0.0085 |
+
+**Comparison to Prototype:**
+
+| Stage | Prototype MAD | Implementation MAD | Delta |
+|---|---|---|---|
+| R32 | 0.063 | 0.0626 | -0.0004 |
+| QF | 0.050 | 0.0390 | -0.0110 |
+| SF | 0.033 | 0.0259 | -0.0071 |
+| Final | 0.019 | 0.0152 | -0.0038 |
+| Champion | 0.011 | 0.0085 | -0.0025 |
+
+Champion differs from prototype (Spain -> Argentina). Delta attributable to: different third-place allocation (backtracking vs greedy), different consensus source weights, different random seed behavior. The backtracking third-place assignment produces more balanced slot allocations, changing the knockout bracket topology.
+
+### Invariants verified
+
+All spec section 14 invariants pass: 48 group placements (all permutations), 32 R32, 16 R16, 8 QF, 4 SF, 2 Final, 1 Winner, nested stage sets valid, winner in finalists in SF in QF in R16 in R32, probabilities finite and in [0,1], per-team stage probabilities monotonic, perfect oracle returns 203, CSV has exactly 111 pick rows, CSV expected_points sum equals JSON expected_score.
+
+### CLI usage
+
+python3 generate_bracket.py --sims 50000 --seed 42
+python3 generate_bracket.py --dry-run
+python3 generate_bracket.py --out _data/my_bracket --formats json,md
+
+### Known limitations
+
+- Bosnia & Herzegovina canonicalized - handled
+- Curaçao/Curacao canonicalized - handled
+- Polymarket coverage limited (6 matches) - handled
+- FIFA 2026 third-place allocation table not available - using backtracking fallback
+- Poisson model not implemented - consensus model is default
+
+### Files generated
+
+| File | Description |
+|---|---|
+| generate_bracket.py | Main script (440 lines) |
+| _data/bracket.json | Full machine-readable result |
+| _data/bracket.csv | Tidy one-row-per-pick table (111 rows) |
+| _data/bracket.md | Human-readable report |

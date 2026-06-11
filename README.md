@@ -7,6 +7,8 @@ A complete pipeline for scraping World Cup odds from multiple open sources, norm
 | Path | Description |
 |---|---|
 | `generate_bracket.py` | **Main bracket generator** — Monte Carlo simulation + optimization |
+| `generate_results.py` | **Results tracker** — compares predictions vs actual results, tracks score |
+| `update_results.py` | **Match result updater** — CLI for entering actual match scores |
 | `normalize_data.py` | Normalizes raw odds from all sources into a common schema |
 | `parse_calendar.py` | Legacy script — downloads ICS calendar, simple expected-points model |
 | `download_data.py` | Downloads raw data from all sources into `_data/raw/` |
@@ -14,8 +16,8 @@ A complete pipeline for scraping World Cup odds from multiple open sources, norm
 | `_data/raw/` | Raw data from 8+ sources (JSON, CSV, HTML, ICS) |
 | `_data/norm/all_odds_normalized.csv` | Normalized consensus odds (398 rows, 6 sources) |
 | `_data/bracket.json` | Full machine-readable bracket output |
-| `_data/bracket.csv` | Tidy 111-row pick table for spreadsheets |
-| `_data/bracket.md` | Human-readable bracket report |
+| `_data/results.json` | Actual match results (updated via update_results.py) |
+| `results.md` | Visual human-readable results with flags, scoring, and accuracy |
 | `brackets_info.md` | Detailed spec for the bracket generator |
 
 ## Pipeline overview
@@ -46,11 +48,14 @@ python3 -m playwright install chromium
 python3 download_data.py
 python3 normalize_data.py
 
-# 3. Generate the bracket (50K simulations, ~20 seconds)
-python3 generate_bracket.py --sims 50000 --seed 42
+# 3. Generate the bracket (1M simulations, ~6 minutes)
+python3 generate_bracket.py --sims 1000000 --seed 42
 
-# 4. View results
-cat _data/bracket.md
+# 4. Generate the visual results tracker
+python3 generate_results.py
+
+# 5. View results
+cat results.md
 ```
 
 ## Results (1,000,000 simulations)
@@ -299,3 +304,49 @@ The analysis now uses the normalized multi-source consensus from `_data/norm/all
 | [OddsPortal archives](https://www.oddsportal.com/football/world/world-championship-2026/) | Pre-match 1X2 odds comparison across bookmakers (web UI; scrape with tools above). |
 
 **Recommendation for multi-source consensus:** Combine BALLDONTLIE (structured US bookmaker odds) + Polymarket Gamma API (prediction-market probabilities) + Betfair Exchange API (true market odds with overround near 0) for the broadest free coverage. Add OddsPapi if you need 350+ bookmakers in a single call.
+
+---
+
+## Results tracking
+
+`generate_results.py` reads `_data/bracket.json` (from `generate_bracket.py`) and `_data/results.json` (actual match results) to produce a living `results.md` scoreboard.
+
+```bash
+# 1. Generate the bracket predictions
+python3 generate_bracket.py --sims 1000000 --seed 42
+
+# 2. Enter match results as they are played
+python3 update_results.py                        # List unscored matches
+python3 update_results.py --group A              # Show Group A matches
+python3 update_results.py -m Mexico_vs_South_Africa -s 2 1
+
+# 3. Regenerate the scoreboard
+python3 generate_results.py
+```
+
+### What the results page shows
+
+- **Expected Score**: probability-weighted points for all picks (e.g. 97.53 / 203). This is computed at bracket-generation time. Higher is better; it is the model's ex-ante estimate of how many points the bracket is worth.
+- **Actual Score**: points earned so far from correct predictions against real results. Starts at 0 and increases as matches are played.
+- **Accuracy**: fraction of resolved predictions that were correct (e.g. 37/91 = 40.7%).
+- **Group tables**: each group shows predicted vs actual placement, with ✅ (correct), ❌ (wrong), ⏳ (pending — not enough matches played to determine final position), or 🟰 (tie — teams are level on points and the tie has not been broken yet).
+- **Per-stage points breakdown**: shows correct/total and points earned for each stage:
+  - Group Placement: +1pt per correct
+  - Advance to Knockout: +1pt per correct
+  - Advance to Round of 16: +2pts per correct
+  - Advance to Quarter-Finals: +4pts per correct
+  - Advance to Semi-Finals: +6pts per correct
+  - Finalist: +10pts per correct
+  - Winner: +15pts
+
+### How ties are resolved
+
+When two or more teams are level on points after all group matches are played, they appear with a 🟰 marker. The current tie-breaker in the code is goal difference, then goals scored. Once enough matches are played to break the tie, the table updates to show the final ranking with ✅ or ❌ per position.
+
+### Data files
+
+| File | Purpose | Updated by |
+|---|---|---|
+| `_data/bracket.json` | Full bracket predictions + probabilities | `generate_bracket.py` |
+| `_data/results.json` | Actual match results | `update_results.py` |
+| `results.md` | Visual scoreboard | `generate_results.py` |

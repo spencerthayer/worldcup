@@ -454,6 +454,8 @@ def render_md(bracket,sim,config,mad,path):
     L.append("# 2026 World Cup Bracket Analysis\n")
     L.append(f"**Generated:** {datetime.now(timezone.utc).isoformat()}\n")
     L.append(f"**Model:** {config['model']} | **Sims:** {config['sims']:,} | **Seed:** {config['seed']}\n")
+    se = math.sqrt(0.25 / config['sims'])
+    L.append(f"**Simulation accuracy:** ±{se*100:.2f}% (standard error bound at p=0.5, N={config['sims']:,})\n")
     score=compute_score(bracket,sim)
     L.append(f"**Expected Score:** {score:.2f} / 203\n")
     L.append("## Source Weights\n"); L.append("| Source | Weight |"); L.append("|---|---|")

@@ -217,7 +217,7 @@ worldcup-predictor,algeria_vs_austria,Algeria,Austria,,2026-06-27,0.256597,0.305
 worldcup-predictor,croatia_vs_ghana,Croatia,Ghana,,2026-06-27,0.818126,0.135713,0.046161,,,,"{""elo_h"": ""1974"", ""elo_a"": ""1626"", ""neutral"": ""True"", ""city"": ""Philadelphia"", ""pick"": ""\u4e3b\u80dc / Home""}"
 polymarket,mexico_vs_south_africa,Mexico,South Africa,,2026-04-06,0.695,0.205,0.105,,,,"{""slug"": ""fifwc-mex-rsa-2026-06-11"", ""n_markets"": 3}"
 polymarket,south_korea_vs_czech_republic,South Korea,Czech Republic,,2026-04-06,0.365,0.315,0.325,,,,"{""slug"": ""fifwc-kr-cze-2026-06-11"", ""n_markets"": 3}"
-polymarket,canada_vs_bosnia_and_herzegovina,Canada,Bosnia and Herzegovina,,2026-04-06,0.525,0.265,,,,,"{""slug"": ""fifwc-can-bih-2026-06-12"", ""n_markets"": 3}"
+polymarket,canada_vs_bosnia_and_herzegovina,Canada,Bosnia and Herzegovina,,2026-04-06,0.525,0.265,0.205,,,,"{""slug"": ""fifwc-can-bih-2026-06-12"", ""n_markets"": 3}"
 polymarket,germany_vs_curaao,Germany,Curaao,,2026-04-06,0.9345,0.044,0.0235,,,,"{""slug"": ""fifwc-ger-kor-2026-06-14"", ""n_markets"": 3}"
 polymarket,usa_vs_paraguay,USA,Paraguay,,2026-04-06,0.495,0.275,0.225,,,,"{""slug"": ""fifwc-usa-par-2026-06-12"", ""n_markets"": 3}"
 polymarket,netherlands_vs_japan,Netherlands,Japan,,2026-04-06,0.465,0.275,0.255,,,,"{""slug"": ""fifwc-nld-jpn-2026-06-14"", ""n_markets"": 3}"

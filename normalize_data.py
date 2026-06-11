@@ -73,6 +73,13 @@ def log(src, n):
     stats[src] = n
     print(f"  {src}: {n} rows")
 
+def _load_json_arrays(obj):
+    """Parse stringified JSON arrays in Polymarket data."""
+    if isinstance(obj, str):
+        try: return json.loads(obj)
+        except: return obj
+    return obj
+
 def parse_betexplorer():
     print("\n--- BetExplorer ---")
     p = RAW/"betexplorer"/"world-cup-calendar.ics"
@@ -158,44 +165,46 @@ def parse_polymarket():
     c = 0
     for ev in events:
         title = ev.get("title",""); et = title.lower()
-        if any(x in et for x in ["exact score","more markets","spread","o/u","over/under",
-                                  "both teams","team to advance","knockout"]): continue
+        skip_keywords = ["exact score","more markets","spread","o/u","over/under",
+                         "both teams","team to advance","knockout"]
+        if any(x in et for x in skip_keywords): continue
         ht = at = None
         for sep in [" vs. "," vs "," - "," @ "]:
             if sep in title:
                 pts = title.split(sep,1)
                 if len(pts)==2: ht,at = pts[0].strip(),pts[1].strip(); break
         if not ht: continue
+        # Normalize team names for comparison
+        nht = nteam(ht).lower()
+        nat = nteam(at).lower()
         hp = dp = ap = None
         for m in ev.get("markets",[]):
             q = m.get("question","").lower()
-            outs = m.get("outcomes",[])
-            prs = m.get("outcomePrices",[])
-            # Handle both list and stringified-list formats
-            if isinstance(outs, str):
-                try: outs = json.loads(outs)
-                except: continue
-            if isinstance(prs, str):
-                try: prs = json.loads(prs)
-                except: continue
+            outs = _load_json_arrays(m.get("outcomes",[]))
+            prs = _load_json_arrays(m.get("outcomePrices",[]))
+            if not isinstance(outs, list) or not isinstance(prs, list): continue
             if len(outs)!=2 or len(prs)!=2: continue
             try: yp = float(prs[0])
             except: continue
-            if "end in a draw" in q: dp = yp
+            if "end in a draw" in q:
+                dp = yp
             elif "will" in q and "win" in q:
                 tm = re.match(r"will (.+?) win on",q)
                 if tm:
                     tn = tm.group(1).strip().lower()
-                    # Fuzzy match: check if team name is substring of home/away
-                    if tn in ht.lower() or ht.lower() in tn: hp = yp
-                    elif tn in at.lower() or at.lower() in tn: ap = yp
+                    ntn = nteam(tn).lower() if tn else tn
+                    # Match against normalized team names
+                    if ntn == nht or ntn in nht or nht in ntn:
+                        hp = yp
+                    elif ntn == nat or ntn in nat or nat in ntn:
+                        ap = yp
         ht,at = nteam(ht),nteam(at)
         ds = ev.get("startDate","")[:10] if ev.get("startDate") else ""
         add(source="polymarket",match_id=mid(ht,at),home_team=ht,away_team=at,
             date=ds,
-            home_win_prob=round(hp,6) if hp else None,
-            draw_prob=round(dp,6) if dp else None,
-            away_win_prob=round(ap,6) if ap else None,
+            home_win_prob=round(hp,6) if hp is not None else None,
+            draw_prob=round(dp,6) if dp is not None else None,
+            away_win_prob=round(ap,6) if ap is not None else None,
             extra={"slug":ev.get("slug",""),"n_markets":len(ev.get("markets",[]))})
         c += 1
     log("polymarket",c)

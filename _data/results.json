@@ -6,57 +6,10 @@
       "score1": 2,
       "score2": 1,
       "winner": "Mexico",
-      "played": true
-    },
-    "South_Korea_vs_Czech_Republic": {
-      "team1": "South Korea",
-      "team2": "Czech Republic",
-      "score1": 1,
-      "score2": 1,
-      "winner": "draw",
-      "played": true
-    },
-    "Mexico_vs_South_Korea": {
-      "team1": "Mexico",
-      "team2": "South Korea",
-      "score1": 3,
-      "score2": 0,
-      "winner": "Mexico",
-      "played": true
-    },
-    "Czech_Republic_vs_Mexico": {
-      "team1": "Czech Republic",
-      "team2": "Mexico",
-      "score1": 0,
-      "score2": 2,
-      "winner": "Mexico",
-      "played": true
-    },
-    "South_Africa_vs_Mexico": {
-      "team1": "South Africa",
-      "team2": "Mexico",
-      "score1": 1,
-      "score2": 2,
-      "winner": "Mexico",
-      "played": true
-    },
-    "Czech_Republic_vs_South_Africa": {
-      "team1": "Czech Republic",
-      "team2": "South Africa",
-      "score1": 2,
-      "score2": 0,
-      "winner": "Czech_Republic",
-      "played": true
-    },
-    "South_Korea_vs_South_Africa": {
-      "team1": "South Korea",
-      "team2": "South Africa",
-      "score1": 3,
-      "score2": 1,
-      "winner": "South_Korea",
-      "played": true
+      "played": true,
+      "group": "A"
     }
   },
   "knockout_matches": {},
-  "last_updated": "2026-06-11T21:06:23.908079+00:00"
+  "last_updated": null
 }

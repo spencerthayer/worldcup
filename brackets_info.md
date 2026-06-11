@@ -1,3 +1,17 @@
+---
+
+Agent Instructions:
+ 1. Read the brackets_info.md and create a comprehensive build plan.
+ 2. Spin up other `Owl Alpha~ subagents to expediate the build.
+ 3. Begin build phase.
+ 4. Regularly commit changes so stuff doesn't get lost.
+ 5. Code review the work.
+ 6. At the end update @brackets_info.md with the work you did at the very bottom of the file be verbose and detailed
+
+ Notes: raw data and normalized data is available to you.
+
+---
+
 # World Cup Bracket Generator - Implementation Instructions
 
 This file is the handoff spec for an agent that will build the local Python
@@ -23,8 +37,8 @@ If it grows too large, split it into:
 | `bracket_optimize.py` | expected-points bracket optimizer |
 | `bracket_validate.py` | invariants and prior comparison |
 
-Do not change raw data files. The generator may write `_data/bracket.json` and
-`_data/bracket.md`.
+Do not change raw data files. The generator may write `_data/bracket.json`,
+`_data/bracket.csv`, and `_data/bracket.md`.
 
 ---
 
@@ -46,8 +60,14 @@ likely winner of every game.
 Expected outputs:
 
 - stdout summary,
-- `_data/bracket.json`,
-- `_data/bracket.md`.
+- `_data/bracket.json` — full machine-readable result (config, picks, per-team
+  probabilities, validation),
+- `_data/bracket.csv` — tidy one-row-per-pick table for spreadsheets,
+- `_data/bracket.md` — human-readable report mirroring the challenge layout.
+
+All three artifacts are written from the same in-memory result object so they
+never disagree. Selection is controlled by `--formats` (§12); the default emits
+all three.
 
 The JSON must contain:
 
@@ -624,7 +644,8 @@ python3 generate_bracket.py \
   --model consensus \
   --strategy ev-bracket \
   --probabilities sim \
-  --out _data/bracket.json
+  --out _data/bracket \
+  --formats csv,json,md
 ```
 
 Options:
@@ -636,14 +657,58 @@ Options:
 | `--model` | `consensus`, `elo`, `poisson` | `consensus` |
 | `--strategy` | `ev-bracket`, `greedy` | `ev-bracket` |
 | `--probabilities` | `sim`, `blend` | `sim` |
-| `--out` | path | `_data/bracket.json` |
+| `--out` | path stem (no extension) | `_data/bracket` |
+| `--formats` | comma list of `csv`, `json`, `md` | `csv,json,md` |
 | `--dry-run` | flag | false |
 
-The same seed and inputs must produce identical output.
+`--out` is a path **stem**: the chosen formats are written by appending the
+matching extension (`<stem>.json`, `<stem>.csv`, `<stem>.md`). For backward
+compatibility, if `--out` ends in `.json`, `.csv`, or `.md`, strip the extension
+to recover the stem and continue to honor `--formats`. The same seed and inputs
+must produce identical output across every format.
 
 ---
 
 ## 13. Rendering Requirements
+
+All formats are serialized from one result object, so values must match exactly
+across JSON, CSV, and markdown (differing only in rounding/presentation).
+
+### 13.1 JSON (`<stem>.json`)
+
+The full machine-readable result using the schema in §1: `generated_at`,
+`config`, `expected_score`, `group_placements`, the six knockout pick lists,
+`per_team_probs`, and `validation`. Numbers are written unrounded (full float
+precision); rounding is a presentation concern handled only in CSV/markdown.
+
+### 13.2 CSV (`<stem>.csv`)
+
+A tidy, one-row-per-pick table (long format), sorted by stage order then group
+then slot. Header and columns:
+
+```text
+stage,group,slot,team,reach_prob,points_if_correct,expected_points
+```
+
+| Column | Meaning |
+|---|---|
+| `stage` | one of `group_placement`, `round_of_32`, `round_of_16`, `quarter_finals`, `semi_finals`, `finalist`, `winner` |
+| `group` | group letter `A`–`L` for `group_placement` rows; empty otherwise |
+| `slot` | placement rank `1`–`4` for `group_placement` rows; empty otherwise |
+| `team` | canonical team name |
+| `reach_prob` | simulated probability the team achieves that stage (for `group_placement`, the probability the team finishes in that exact slot) |
+| `points_if_correct` | per-pick points for the stage from the §2 table (`1`, `1`, `2`, `4`, `6`, `10`, `15`) |
+| `expected_points` | `reach_prob * points_if_correct` |
+
+Row counts per file: 48 `group_placement` + 32 + 16 + 8 + 4 + 2 + 1 = **111 pick
+rows** plus the header. The sum of the `expected_points` column must equal
+`expected_score` in the JSON (within float tolerance). Quote fields containing
+commas (team names generally do not, but quote defensively) and write UTF-8 so
+names like `Curaçao` and `Türkiye` round-trip. Use `reach_prob` rounded to six
+decimals and `expected_points` to six decimals in the CSV (machine-friendly);
+markdown applies coarser display rounding per §13.3.
+
+### 13.3 Markdown (`<stem>.md`)
 
 The markdown report should include:
 
@@ -690,7 +755,11 @@ Minimum assertions:
 - probabilities are finite and in `[0,1]`,
 - per-team stage probabilities are monotonic:
   `R32 >= R16 >= QF >= SF >= Final >= Champion`,
-- perfect oracle scoring function returns 203.
+- perfect oracle scoring function returns 203,
+- the CSV holds exactly 111 pick rows (48 + 32 + 16 + 8 + 4 + 2 + 1) plus header,
+- the CSV `expected_points` column sums to the JSON `expected_score` within a
+  small float tolerance,
+- JSON, CSV, and markdown report identical picks and identical `expected_score`.
 
 Dry run should:
 

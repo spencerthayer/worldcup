@@ -1,6 +1,9 @@
-# 2026 World Cup — Odds, Data Pipeline & Monte Carlo Bracket
+# 2026 World Cup
+## Odds, Data Pipeline & Monte Carlo Bracket
 
 A complete pipeline for scraping World Cup odds from multiple open sources, normalizing them into a consensus probability model, and running Monte Carlo simulations to produce an optimized bracket for the WC Bracket Challenge (maximizing expected points out of 203).
+
+See the [results](results.md).
 
 ## Repository structure
 

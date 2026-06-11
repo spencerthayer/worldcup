@@ -213,6 +213,65 @@ $$+ \sum_{t \in B_{\text{SF}}} 6 \cdot P(t \text{ reaches SF})$$
 $$+ \sum_{t \in B_{\text{F}}} 10 \cdot P(t \text{ reaches Final})$$
 $$+ 15 \cdot P(B_{\text{winner}} \text{ wins tournament})$$
 
+
+## How the expected score is computed
+
+The **expected score** (e.g. **97.53 / 203**) is the probability-weighted sum of every pick in the bracket. For each pick, multiply the probability that the pick is correct by the points it would earn, then sum over all 111 picks.
+
+### The formula
+
+For any single pick:
+
+    E[points] = P(pick is correct) x points if correct
+
+The total expected score sums this over every stage:
+
+    E[score] = sum_group_picks P(correct) x 1
+             + sum_R32_picks P(advances) x 1
+             + sum_R16_picks P(advances) x 2
+             + sum_QF_picks P(advances) x 4
+             + sum_SF_picks P(advances) x 6
+             + sum_F_picks P(advances) x 10
+             + P(champion wins) x 15
+
+### Concrete examples from the current bracket
+
+**Group placement (1 pt each):** Mexico is predicted 1st in Group A. The simulation shows Mexico finishes 1st in 53.8% of iterations:
+
+    E[A-1st] = 0.538 x 1 = 0.538 expected points
+
+South Korea is predicted 2nd but only finishes 2nd in 26.2% of simulations:
+
+    E[A-2nd] = 0.262 x 1 = 0.262 expected points
+
+Across all 48 group placement picks, this sums to roughly 23 expected points (out of 48 max). You do not expect to get all 48 right -- even the best model has uncertainty.
+
+**Advance to Round of 32 (1 pt each):** Spain reaches the knockout in 98.3% of simulations:
+
+    E[Spain in R32] = 0.983 x 1 = 0.983 expected points
+
+**Champion (15 pts):** Spain is the predicted champion, winning in 16.9% of simulations:
+
+    E[champion] = 0.169 x 15 = 2.54 expected points
+
+### Why 97.53 and not 203?
+
+203 is the perfect score. 97.53 is what you would win on average if you could play this bracket millions of times. The gap reflects genuine uncertainty:
+
+| Stage | Max | Expected | Why the gap |
+|---|---:|---:|---|
+| Group Placement | 48 | ~23 | Hard to predict exact 1st/2nd/3rd/4th |
+| Advance to R32 | 32 | ~27 | Easier to predict who qualifies |
+| Advance to R16 | 32 | ~18 | Competitive matches, upsets |
+| Advance to QF | 32 | ~14 | Only 8 of 32 teams survive |
+| Advance to SF | 24 | ~8 | Deep uncertainty |
+| Finalist | 20 | ~5 | Very hard to predict finalists |
+| Champion | 15 | ~2.5 | 83% chance the pick is wrong |
+| **Total** | **203** | **~97.53** | |
+
+Even picking the champion (16.9% probability) only contributes 2.54 expected points because there is an 83.1% chance that pick is wrong. The model is well-calibrated: over many brackets, it would average 97.53 points per bracket.
+
+
 **Group placements** are optimized by brute force over all $4! = 24$ permutations per group, picking the ordering that maximizes expected placement points.
 
 **Knockout picks** are filled deterministically: optimized group seeds are placed into the bracket skeleton, third-place teams are assigned via backtracking, and a bracket-tree dynamic program chooses the feasible set of winners that maximizes expected stage points. This is different from simply choosing the team with higher one-match advancement probability. The picks are constrained to be nested: $\text{Winner} \subset \text{Finalists} \subset \text{SF} \subset \text{QF} \subset \text{R16} \subset \text{R32}$.

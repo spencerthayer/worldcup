@@ -118,6 +118,7 @@ you can integrate to improve coverage, cross-reference bookmakers, or build a co
 
 | Source | Type | Coverage | Notes |
 |---|---|---|---|
+| [BetExplorer](https://www.betexplorer.com/) | Web scrape / ICS embed | 1X2 odds from 30+ bookmakers averaged per match | The current source. Odds are embedded in the kubeia.io ICS calendar. Also available as a web scraper via OddsHarvester or direct page scrape. |
 | [BALLDONTLIE FIFA API](https://fifa.balldontlie.io/) | REST API (JSON) | 2018, 2022, 2026 tournaments | Free API key; includes moneyline, spread, total odds from FanDuel, DraftKings, etc. Cursor-based pagination. |
 | [The Odds API](https://the-odds-api.com/) | REST API (JSON) | ~40 bookmakers (Bet365, DraftKings, FanDuel, William Hill…) | 500 free credits/mo. Covers 1X2, spreads, totals. No Pinnacle / Betfair. SDKs on GitHub under Apache-2.0. |
 | [OddsPapi](https://oddspapi.io/) | REST API (JSON) | 350+ bookmakers (incl. Pinnacle, Singbet, Betfair Exchange) | 250 free requests/mo. Each request returns all bookmakers. Historical odds included. |

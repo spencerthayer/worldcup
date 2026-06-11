@@ -151,64 +151,80 @@ def parse_betexplorer():
 
         hp, dp, ap = probs_from_odds(home_odds, draw_odds, away_odds)
         home_team = normalize_team(home_team)
+def parse_polymarket():
+    print("\n--- Parsing Polymarket ---")
+    # Load the dedicated match-level events file
+    match_path = RAW / "polymarket" / "fifa-wc-match-events.json"
+    if not match_path.exists():
+        print("  [SKIP] not found"); return
+
+    with open(match_path) as f:
+        events = json.load(f)
+
+    count = 0
+    for event in events:
+        title = event.get("title", "")
+        etitle = title.lower()
+
+        # Skip non-match events
+        if any(x in etitle for x in ["exact score", "more markets", "spread", "o/u", "over/under",
+                                      "both teams to score", "team to advance", "knockout"]):
+            continue
+
+        # Extract teams from title: "Mexico vs. South Africa" or "Korea Republic vs. Czechia"
+        home_team = away_team = None
+        for sep in [" vs. ", " vs ", " - ", " @ "]:
+            if sep in title:
+                parts = title.split(sep, 1)
+                if len(parts) == 2:
+                    home_team = parts[0].strip()
+                    away_team = parts[1].strip()
+                    break
+        if not home_team:
+            continue
+
+        markets = event.get("markets", [])
+        # Collect home/draw/away probabilities from the 3 yes/no markets
+        home_prob = draw_prob = away_prob = None
+        for m in markets:
+            q = m.get("question", "").lower()
+            outcomes = m.get("outcomes", [])
+            prices_raw = m.get("outcomePrices", [])
+            if len(outcomes) != 2 or len(prices_raw) != 2:
+                continue
+            try:
+                yes_prob = float(prices_raw[0])
+            except (ValueError, TypeError):
+                continue
+
+            if "end in a draw" in q:
+                draw_prob = yes_prob
+            elif "will" in q and "win" in q:
+                # Extract team from question
+                team_m = re.match(r"will (.+?) win on", q)
+                if team_m:
+                    team_name = team_m.group(1).strip()
+                    if team_name.lower() in home_team.lower():
+                        home_prob = yes_prob
+                    elif team_name.lower() in away_team.lower():
+                        away_prob = yes_prob
+
+        home_team = normalize_team(home_team)
         away_team = normalize_team(away_team)
+        date_str = event.get("startDate", "")[:10] if event.get("startDate") else ""
+
         add_row(
-            source="betexplorer", match_id=make_match_id(home_team, away_team),
-            home_team=home_team, away_team=away_team, group=group, date=date_str,
-            home_win_prob=hp, draw_prob=dp, away_win_prob=ap,
-            home_win_odds=home_odds, draw_odds=draw_odds, away_win_odds=away_odds,
+            source="polymarket", match_id=make_match_id(home_team, away_team),
+            home_team=home_team, away_team=away_team,
+            date=date_str,
+            home_win_prob=round(home_prob, 6) if home_prob is not None else None,
+            draw_prob=round(draw_prob, 6) if draw_prob is not None else None,
+            away_win_prob=round(away_prob, 6) if away_prob is not None else None,
+            extra={"event_slug": event.get("slug", ""), "num_markets": len(markets)},
         )
         count += 1
-    log("betexplorer", count)
 
-
-# ===================================================================
-# 2. uanalyse
-# ===================================================================
-def parse_uanalyse():
-    print("\n--- Parsing uanalyse ---")
-    csv_path = RAW / "uanalyse" / "latest" / "match_predictions.csv"
-    if not csv_path.exists():
-        print("  [SKIP] not found"); return
-    count = 0
-    with open(csv_path, newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            home = normalize_team(row.get("home_team", ""))
-            away = normalize_team(row.get("away_team", ""))
-            if not home or not away:
-                continue
-            stage = row.get("stage", "")
-            group = ""
-            g = re.search(r"Group ([A-L])", stage)
-            if g:
-                group = g.group(1)
-            add_row(
-                source="uanalyse", match_id=make_match_id(home, away),
-                home_team=home, away_team=away, group=group,
-                date=row.get("kickoff_date", ""),
-                home_win_prob=round(float(row.get("prob_home_win", 0) or 0), 6),
-                draw_prob=round(float(row.get("prob_draw", 0) or 0), 6),
-                away_win_prob=round(float(row.get("prob_away_win", 0) or 0), 6),
-                extra={"snapshot_date": row.get("snapshot_date", ""),
-                       "stage": stage,
-                       "exp_home_goals": row.get("exp_home_goals"),
-                       "exp_away_goals": row.get("exp_away_goals")},
-            )
-            count += 1
-    log("uanalyse", count)
-
-
-# ===================================================================
-# 3. worldcup-predictor
-# ===================================================================
-def parse_worldcup_predictor():
-    print("\n--- Parsing worldcup-predictor ---")
-    csv_path = RAW / "worldcup-predictor" / "wc2026_predictions.csv"
-    if not csv_path.exists():
-        print("  [SKIP] not found"); return
-    count = 0
-    with open(csv_path, newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
+    log("polymarket", count)
             home = normalize_team(row.get("home_team", ""))
             away = normalize_team(row.get("away_team", ""))
             if not home or not away:

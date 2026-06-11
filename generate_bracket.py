@@ -253,6 +253,37 @@ def optimize_groups(groups,sim):
         placements[gl]=list(best)
     return placements
 
+def _stage_for_match_winner(num):
+    if 73 <= num <= 88: return "r16", 2
+    if 89 <= num <= 96: return "qf", 4
+    if 97 <= num <= 100: return "sf", 6
+    if 101 <= num <= 102: return "final", 10
+    return None, 0
+
+def _empty_picks():
+    return {"r16":set(),"qf":set(),"sf":set(),"final":set(),"champion":None}
+
+def _merge_picks(a,b):
+    r=_empty_picks()
+    for k in ["r16","qf","sf","final"]:
+        r[k]=set(a.get(k,set()))|set(b.get(k,set()))
+    r["champion"]=a.get("champion") or b.get("champion")
+    return r
+
+def _copy_picks(picks):
+    r=_empty_picks()
+    for k in ["r16","qf","sf","final"]:
+        r[k]=set(picks.get(k,set()))
+    r["champion"]=picks.get("champion")
+    return r
+
+def _better_option(current,candidate):
+    if current is None: return candidate
+    cev,cteam,_=current
+    nev,nteam,_=candidate
+    if nev != cev: return candidate if nev > cev else current
+    return candidate if nteam < cteam else current
+
 def fill_knockout_bracket(gplacements,sim,consensus,elo,groups,gfix,knockout,rng):
     seeds={}
     for gl,ordering in gplacements.items():
@@ -267,8 +298,58 @@ def fill_knockout_bracket(gplacements,sim,consensus,elo,groups,gfix,knockout,rng
         if len(ordering)>=3: tg[ordering[2]]=gl
     ts=assign_thirds(qt,tg,knockout,rng)
     for sk,team in ts.items(): seeds[sk]=team
-    _, _, r32, r16, qf, sf, fins, champ = _process_knockout(knockout, seeds, consensus, elo, rng)
-    return {"r32":r32,"r16":r16,"qf":qf,"sf":sf,"final":fins,"champion":champ}
+    by_num={km["num"]:km for km in knockout if km.get("num") is not None}
+    final=next((km for km in knockout if km.get("round")=="Final"),None)
+    memo={}
+    def resolve_leaf(slot):
+        if slot in seeds: return seeds[slot]
+        return None
+    def solve_slot(slot):
+        team=resolve_leaf(slot)
+        if team: return {team:(0.0,_empty_picks())}
+        if slot.startswith("W"):
+            return solve_match(int(slot[1:]))
+        return {}
+    def combine_children(left,right,stage,points):
+        options={}
+        for lt,(lev,lpicks) in left.items():
+            for rt,(rev,rpicks) in right.items():
+                base=lev+rev
+                for winner in [lt,rt]:
+                    picks=_merge_picks(lpicks,rpicks)
+                    ev=base
+                    if stage:
+                        picks[stage].add(winner)
+                        ev+=points*sim.get(stage,{}).get(winner,0)
+                    else:
+                        picks["champion"]=winner
+                        ev+=15*sim.get("champion",{}).get(winner,0)
+                    candidate=(ev,winner,picks)
+                    options[winner]=_better_option(options.get(winner),candidate)
+        return {team:(ev,picks) for team,(ev,_,picks) in options.items()}
+    def solve_match(num):
+        if num in memo: return memo[num]
+        km=by_num[num]
+        left=solve_slot(km["team1"]); right=solve_slot(km["team2"])
+        stage,points=_stage_for_match_winner(num)
+        memo[num]=combine_children(left,right,stage,points)
+        return memo[num]
+    if not final:
+        return {"r32":set(),"r16":set(),"qf":set(),"sf":set(),"final":set(),"champion":None}
+    left=solve_slot(final["team1"]); right=solve_slot(final["team2"])
+    final_options=combine_children(left,right,None,15)
+    best=None
+    for team,(ev,picks) in final_options.items():
+        best=_better_option(best,(ev,team,picks))
+    picks=_copy_picks(best[2]) if best else _empty_picks()
+    r32=set()
+    for km in knockout:
+        num=km.get("num")
+        if num is None or not (73 <= num <= 88): continue
+        for slot in [km["team1"],km["team2"]]:
+            team=resolve_leaf(slot)
+            if team: r32.add(team)
+    return {"r32":r32,"r16":picks["r16"],"qf":picks["qf"],"sf":picks["sf"],"final":picks["final"],"champion":picks["champion"]}
 
 def compute_score(bracket,sim):
     score=0.0
@@ -315,6 +396,36 @@ def compute_mad(sim,priors):
         if count>0: mad[ss]=round(total/count,6)
     return mad
 
+def blend_probabilities(sim,priors):
+    blended={k:{t:p for t,p in v.items()} if isinstance(v,dict) else v for k,v in sim.items()}
+    cfg={"r32":("prob_reach_round_of_32",0.80),"qf":("prob_reach_quarterfinals",0.65),"sf":("prob_reach_semifinals",0.60),"final":("prob_reach_final",0.55),"champion":("prob_champion",0.55)}
+    teams=set()
+    for stage in ["r32","r16","qf","sf","final","champion"]:
+        teams.update(sim.get(stage,{}).keys())
+    teams.update(priors.keys())
+    for stage,(prior_key,alpha) in cfg.items():
+        blended[stage]={}
+        for t in teams:
+            ps=sim.get(stage,{}).get(t,0)
+            pp=priors.get(t,{}).get(prior_key,ps)
+            blended[stage][t]=alpha*ps+(1-alpha)*pp
+    blended["r16"]={t:sim.get("r16",{}).get(t,0) for t in teams}
+    order=["r32","r16","qf","sf","final","champion"]
+    for t in teams:
+        prev=1.0
+        for stage in order:
+            p=max(0.0,min(1.0,blended.get(stage,{}).get(t,0)))
+            p=min(p,prev)
+            blended.setdefault(stage,{})[t]=p
+            prev=p
+    return blended
+
+def per_team_probs(sim):
+    teams=set()
+    for stage in ["r32","r16","qf","sf","final","champion"]:
+        teams.update(sim.get(stage,{}).keys())
+    return {t:{stage:round(sim.get(stage,{}).get(t,0),6) for stage in ["r32","r16","qf","sf","final","champion"]} for t in sorted(teams)}
+
 def render_json(result,path):
     with open(path,"w",encoding="utf-8") as f: json.dump(result,f,indent=2,ensure_ascii=False)
 
@@ -335,7 +446,7 @@ def render_csv(bracket,sim,path):
         p=sim.get("champion",{}).get(w,0); pt=pts_map["winner"]
         rows.append({"stage":"winner","group":"","slot":"","team":w,"reach_prob":round(p,6),"points_if_correct":pt,"expected_points":round(p*pt,6)})
     with open(path,"w",newline="",encoding="utf-8") as f:
-        w=csv.DictWriter(f,fieldnames=["stage","group","slot","team","reach_prob","points_if_correct","expected_points"])
+        w=csv.DictWriter(f,fieldnames=["stage","group","slot","team","reach_prob","points_if_correct","expected_points"],lineterminator="\n")
         w.writeheader(); w.writerows(rows)
 
 def render_md(bracket,sim,config,mad,path):
@@ -399,6 +510,10 @@ def main():
     parser.add_argument("--formats",default="csv,json,md")
     parser.add_argument("--dry-run",action="store_true")
     args=parser.parse_args()
+    if args.model == "poisson":
+        parser.error("--model poisson is not implemented yet; use --model consensus or --model elo")
+    if args.strategy != "ev-bracket":
+        parser.error("--strategy greedy is not implemented yet; use --strategy ev-bracket")
     out_stem=args.out
     for ext in [".json",".csv",".md"]:
         if out_stem.endswith(ext): out_stem=out_stem[:-len(ext)]
@@ -413,26 +528,28 @@ def main():
     print(f"  Consensus: {len(consensus)} matches")
     if args.dry_run:
         print("\n*** DRY RUN ***"); return
+    active_consensus=consensus if args.model=="consensus" else {}
     print(f"\nSimulating {args.sims:,} iterations...")
-    sim=simulate(groups,gfix,knockout,consensus,elo,xg,args.sims,args.seed,args.model)
+    sim=simulate(groups,gfix,knockout,active_consensus,elo,xg,args.sims,args.seed,args.model)
+    opt_probs=blend_probabilities(sim,priors) if args.probabilities=="blend" else sim
     print("  Done.")
     print("\nOptimizing...")
-    gplacements=optimize_groups(groups,sim)
+    gplacements=optimize_groups(groups,opt_probs)
     rng=random.Random(args.seed)
-    ko=fill_knockout_bracket(gplacements,sim,consensus,elo,groups,gfix,knockout,rng)
+    ko=fill_knockout_bracket(gplacements,opt_probs,active_consensus,elo,groups,gfix,knockout,rng)
     bracket={"group_placements":gplacements,"round_of_32":sorted(ko["r32"]),"round_of_16":sorted(ko["r16"]),"quarter_finals":sorted(ko["qf"]),"semi_finals":sorted(ko["sf"]),"finalists":sorted(ko["final"]),"winner":ko["champion"]}
-    score=compute_score(bracket,sim)
+    score=compute_score(bracket,opt_probs)
     bracket["expected_score"]=score
     print("\nValidating...")
-    errs=validate(bracket,groups,sim)
+    errs=validate(bracket,groups,opt_probs)
     for e in errs: print(f"  ERROR: {e}")
     if not errs: print("  All invariants passed.")
     mad=compute_mad(sim,priors)
-    result={"generated_at":datetime.now(timezone.utc).isoformat(),"config":{"sims":args.sims,"seed":args.seed,"model":args.model,"strategy":args.strategy,"probabilities":args.probabilities},"expected_score":score,"group_placements":bracket["group_placements"],"round_of_32":bracket["round_of_32"],"round_of_16":bracket["round_of_16"],"quarter_finals":bracket["quarter_finals"],"semi_finals":bracket["semi_finals"],"finalists":bracket["finalists"],"winner":bracket["winner"],"validation":{"errors":errs,"mad_vs_uanalyse":mad}}
+    result={"generated_at":datetime.now(timezone.utc).isoformat(),"config":{"sims":args.sims,"seed":args.seed,"model":args.model,"strategy":args.strategy,"probabilities":args.probabilities},"expected_score":score,"group_placements":bracket["group_placements"],"round_of_32":bracket["round_of_32"],"round_of_16":bracket["round_of_16"],"quarter_finals":bracket["quarter_finals"],"semi_finals":bracket["semi_finals"],"finalists":bracket["finalists"],"winner":bracket["winner"],"per_team_probs":per_team_probs(opt_probs),"validation":{"errors":errs,"mad_vs_uanalyse":mad}}
     print(f"\nWriting outputs...")
     if "json" in formats: render_json(result,f"{out_stem}.json"); print(f"  {out_stem}.json")
-    if "csv" in formats: render_csv(bracket,sim,f"{out_stem}.csv"); print(f"  {out_stem}.csv")
-    if "md" in formats: render_md(bracket,sim,result["config"],mad,f"{out_stem}.md"); print(f"  {out_stem}.md")
+    if "csv" in formats: render_csv(bracket,opt_probs,f"{out_stem}.csv"); print(f"  {out_stem}.csv")
+    if "md" in formats: render_md(bracket,opt_probs,result["config"],mad,f"{out_stem}.md"); print(f"  {out_stem}.md")
     print(f"\n{'='*60}\nExpected Score: {score:.2f} / 203\nWinner: {bracket['winner']}")
     if mad: print(f"MAD: {', '.join(f'{s}={v:.4f}' for s,v in mad.items())}")
     print("="*60)

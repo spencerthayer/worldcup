@@ -1,10 +1,10 @@
 # 2026 World Cup Bracket Analysis
 
-**Generated:** 2026-06-11T18:47:03.560340+00:00
+**Generated:** 2026-06-11T18:57:51.409695+00:00
 
 **Model:** consensus | **Sims:** 50,000 | **Seed:** 42
 
-**Expected Score:** 93.23 / 203
+**Expected Score:** 97.54 / 203
 
 ## Source Weights
 
@@ -75,12 +75,12 @@
 - Brazil (64.7%)
 - Canada (45.5%)
 - Colombia (53.7%)
+- Ecuador (46.1%)
 - England (66.9%)
 - France (73.4%)
 - Germany (66.3%)
-- Ivory Coast (32.6%)
+- Mexico (54.2%)
 - Netherlands (52.8%)
-- Norway (31.6%)
 - Portugal (61.9%)
 - Spain (72.2%)
 - Switzerland (55.8%)
@@ -92,17 +92,17 @@
 - Argentina (50.7%)
 - Belgium (36.7%)
 - Brazil (43.7%)
-- Germany (36.1%)
-- Ivory Coast (11.4%)
+- England (43.8%)
+- France (50.9%)
 - Netherlands (35.1%)
+- Portugal (38.2%)
 - Spain (52.4%)
-- Switzerland (24.6%)
 
 ## Semi-Finals (4 teams)
 
 - Argentina (36.6%)
 - Brazil (27.1%)
-- Netherlands (19.6%)
+- France (34.4%)
 - Spain (39.5%)
 
 ## Finalists (2 teams)
@@ -110,7 +110,7 @@
 - Argentina (24.1%)
 - Spain (26.4%)
 
-## Champion: Argentina (15.1%)
+## Champion: Spain (16.8%)
 
 ## Top Champion Probabilities
 

@@ -84,12 +84,12 @@ round_of_16,,,Belgium,0.62612,2,1.25224
 round_of_16,,,Brazil,0.64712,2,1.29424
 round_of_16,,,Canada,0.45454,2,0.90908
 round_of_16,,,Colombia,0.53692,2,1.07384
+round_of_16,,,Ecuador,0.46094,2,0.92188
 round_of_16,,,England,0.66866,2,1.33732
 round_of_16,,,France,0.73396,2,1.46792
 round_of_16,,,Germany,0.66276,2,1.32552
-round_of_16,,,Ivory Coast,0.32642,2,0.65284
+round_of_16,,,Mexico,0.54212,2,1.08424
 round_of_16,,,Netherlands,0.52796,2,1.05592
-round_of_16,,,Norway,0.31606,2,0.63212
 round_of_16,,,Portugal,0.61914,2,1.23828
 round_of_16,,,Spain,0.72172,2,1.44344
 round_of_16,,,Switzerland,0.55756,2,1.11512
@@ -98,15 +98,15 @@ round_of_16,,,USA,0.42838,2,0.85676
 quarter_finals,,,Argentina,0.5071,4,2.0284
 quarter_finals,,,Belgium,0.36718,4,1.46872
 quarter_finals,,,Brazil,0.437,4,1.748
-quarter_finals,,,Germany,0.36076,4,1.44304
-quarter_finals,,,Ivory Coast,0.11358,4,0.45432
+quarter_finals,,,England,0.43848,4,1.75392
+quarter_finals,,,France,0.50892,4,2.03568
 quarter_finals,,,Netherlands,0.35104,4,1.40416
+quarter_finals,,,Portugal,0.3819,4,1.5276
 quarter_finals,,,Spain,0.52388,4,2.09552
-quarter_finals,,,Switzerland,0.24636,4,0.98544
 semi_finals,,,Argentina,0.36556,6,2.19336
 semi_finals,,,Brazil,0.27124,6,1.62744
-semi_finals,,,Netherlands,0.1955,6,1.173
+semi_finals,,,France,0.3444,6,2.0664
 semi_finals,,,Spain,0.39468,6,2.36808
 finalists,,,Argentina,0.2408,10,2.408
 finalists,,,Spain,0.26438,10,2.6438
-winner,,,Argentina,0.15116,15,2.2674
+winner,,,Spain,0.16828,15,2.5242

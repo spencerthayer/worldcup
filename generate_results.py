@@ -37,6 +37,12 @@ STAGE_POINTS = {
     "quarter_finals": 4, "semi_finals": 6, "finalists": 10, "winner": 15,
 }
 
+STAGE_KEY = {
+    "round_of_32": "r32", "round_of_16": "r16",
+    "quarter_finals": "qf", "semi_finals": "sf",
+    "finalists": "final", "winner": "champion",
+}
+
 
 def flag(name):
     return FLAGS.get(name, "🏳️")
@@ -56,18 +62,17 @@ def compute_expected_score(bracket, per_team_probs):
     for g, teams in bracket["group_placements"].items():
         for pos, team in enumerate(teams):
             placement_probs = per_team_probs.get(team, {}).get("placement", {})
-            key = str(pos + 1)
-            p = placement_probs.get(key, 0)
+            p = placement_probs.get(str(pos + 1), 0)
             score += p * 1
-    stage_key = {
-        "round_of_32": "r32", "round_of_16": "r16",
-        "quarter_finals": "qf", "semi_finals": "sf",
-        "finalists": "final", "winner": "champion",
-    }
-    for stage, key in stage_key.items():
+    for stage, key in STAGE_KEY.items():
+        if stage == "winner":
+            w = bracket.get("winner", "")
+            picks = [w] if w else []
+        else:
+            picks = bracket.get(stage, [])
         points = STAGE_POINTS[stage]
-        for team in bracket.get(stage, []):
-            p = per_team_probs.get(team, {}).get(key, 0)
+        for t in picks:
+            p = per_team_probs.get(t, {}).get(key, 0)
             score += p * points
     return score
 
@@ -142,17 +147,17 @@ def render_knockout_bracket(bracket, per_team_probs):
 
     if winner:
         lines.append(f"### 👑 Champion: {flag(winner)} {winner}\n")
-    for stage, key in stage_key.items():
-        if stage == "winner":
-            w = bracket.get("winner", "")
-            picks = [w] if w else []
-        else:
-            picks = bracket.get(stage, [])
-        points = STAGE_POINTS[stage]
-        stage_score = sum(per_team_probs.get(t, {}).get(key, 0) * points for t in picks)
-        total += stage_score
-        max_pts = len(picks) * points
-        rows.append((stage.replace("_", " ").title(), len(picks), points, max_pts, stage_score))
+
+    return lines
+
+
+def render_champion_probabilities(per_team_probs, top_n=15):
+    lines = []
+    lines.append("## 🏅 Champion Probabilities\n")
+    lines.append("| Rank | Team | Probability |")
+    lines.append("|:---:|:---:|:---:|")
+    champs = sorted(per_team_probs.items(), key=lambda x: -x[1].get("champion", 0))
+    for i, (team, probs) in enumerate(champs[:top_n], 1):
         p = probs.get("champion", 0)
         if p > 0:
             medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
@@ -177,12 +182,7 @@ def render_stage_breakdown(bracket, per_team_probs):
     total += gp_score
     rows.append(("Group Placement", 48, 1, 48, gp_score))
 
-    stage_key = {
-        "round_of_32": "r32", "round_of_16": "r16",
-        "quarter_finals": "qf", "semi_finals": "sf",
-        "finalists": "final", "winner": "champion",
-    }
-    for stage, key in stage_key.items():
+    for stage, key in STAGE_KEY.items():
         if stage == "winner":
             w = bracket.get("winner", "")
             picks = [w] if w else []

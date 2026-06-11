@@ -107,3 +107,58 @@ wild_card_picks: dict[str, str] = {
 ```
 
 To change bracket picks, modify the `pick_winner()` function or override individual match results in `print_bracket()`.
+
+## Odds data sources
+
+The analysis currently uses one source (average BetExplorer 1X2 odds from the ICS calendar).
+Below are additional **open / free / publicly accessible** sources for World Cup match odds
+you can integrate to improve coverage, cross-reference bookmakers, or build a consensus model.
+
+### Free APIs (no cost, no/low auth)
+
+| Source | Type | Coverage | Notes |
+|---|---|---|---|
+| [BALLDONTLIE FIFA API](https://fifa.balldontlie.io/) | REST API (JSON) | 2018, 2022, 2026 tournaments | Free API key; includes moneyline, spread, total odds from FanDuel, DraftKings, etc. Cursor-based pagination. |
+| [The Odds API](https://the-odds-api.com/) | REST API (JSON) | ~40 bookmakers (Bet365, DraftKings, FanDuel, William Hill…) | 500 free credits/mo. Covers 1X2, spreads, totals. No Pinnacle / Betfair. SDKs on GitHub under Apache-2.0. |
+| [OddsPapi](https://oddspapi.io/) | REST API (JSON) | 350+ bookmakers (incl. Pinnacle, Singbet, Betfair Exchange) | 250 free requests/mo. Each request returns all bookmakers. Historical odds included. |
+| [football-data.org](https://www.football-data.org/) | REST API (JSON) | FIFA World Cup included | Free tier: 10 calls/min. Good for fixtures + basic odds prototyping. |
+| [Polymarket Gamma API](https://docs.polymarket.com/market-data/overview) | REST API (JSON) | Prediction-market odds for every match, group, knockout round, tournament winner | No auth, no key, no wallet required. Real-time probabilities from the largest prediction market. |
+| [Betfair Exchange API](https://developer.betfair.com/) | REST API (JSON) | Full exchange odds (back/lay) for World Cup matches | Free with active Betfair account (Delayed App Key). Live key £499 one-off. Best for true market-implied probabilities. |
+| [worldcup2026](https://github.com/rezarahiminia/worldcup2026) | Self-hosted REST API (Docker) | Teams, groups, matches, stadiums, standings | Open-source, no API key. Demo at `worldcup26.ir`. Can be self-hosted. |
+
+### Open datasets & GitHub repos
+
+| Source | Format | What's included |
+|---|---|---|
+| [openfootball/worldcup.json](https://github.com/openfootball/worldcup.json) | JSON | Full 2026 match schedule (fixtures, dates, times, venues, groups). Public domain, no key. Raw: `raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json` |
+| [openfootball/worldcup](https://github.com/openfootball/worldcup) | Football.TXT | Historical + 2026 World Cup data in plain-text format. |
+| [FiveThirtyEight /data/world-cup-predictions](https://github.com/fivethirtyeight/data/tree/master/world-cup-predictions) | CSV | Historical World Cup predictions with SPI-based win probabilities. Methodology for knockout-round projection. |
+| [uanalyse/world-cup-2026-predictions](https://github.com/uanalyse/world-cup-2026-predictions) | JSON/CSV | Daily timestamped 2026 forecasts, published pre-kickoff, append-only. |
+| [hjjbh1314/worldcup-predictor](https://github.com/hjjbh1314/worldcup-predictor) | Python + data | Elo-based W/D/L predictor with optional free odds overlay. 60% backtest accuracy. |
+| [Hicruben/world-cup-2026-prediction-model](https://github.com/Hicruben/world-cup-2026-prediction-model) | Python | Open-source Elo + Dixon-Coles + Monte Carlo model for 2026. |
+
+### Scrapers & tools (build your own odds collector)
+
+| Source | Language | Target |
+|---|---|---|
+| [OddsHarvester](https://github.com/jordantete/OddsHarvester) | Python (Playwright) | Scrapes OddsPortal — 10 sports, 100+ leagues, dozens of markets. Outputs JSON/CSV/S3. |
+| [Sports-Betting-Data-Scraping](https://github.com/morrisndurere/Sports-Betting-Data-Scraping) | Python | OddsPortal scraper focused on football odds → CSV. |
+| [betScrapeR](https://github.com/dashee87/betScrapeR) | R | Combines Betfair API exchange data with scraped bookmaker odds. |
+| [Apify Polymarket Scraper](https://apify.com/louisdeconinck/polymarket-events-scraper/api) | No-code / API | Scrapes Polymarket prediction markets → CSV/JSON. No API key. |
+
+### Prediction-market dashboards (manual export)
+
+| Source | Notes |
+|---|---|
+| [Polymarket World Cup](https://polymarket.com/sports/world-cup/props) | Real-time match & futures odds. Use the free Gamma API above for programmatic access. |
+| [FIFA VOdds / polyanalytics.co](https://fifavodds.com/) | Aggregates Polymarket + Kalshi + sportsbooks. CSV export from dashboard. |
+| [Nate Silver's PELE model](https://www.natesilver.net/p/world-cup-2026-odds-predictions) | 100K simulations for all 48 teams & 104 matches. Published odds tables. |
+
+### Historical odds archives
+
+| Source | Coverage |
+|---|---|
+| [Covers Sports odds history](https://www.covers.com/world-cup/odds) | Pre-tournament outright odds from 2002 onward (decimal). |
+| [OddsPortal archives](https://www.oddsportal.com/football/world/world-championship-2026/) | Pre-match 1X2 odds comparison across bookmakers (web UI; scrape with tools above). |
+
+**Recommendation for multi-source consensus:** Combine BALLDONTLIE (structured US bookmaker odds) + Polymarket Gamma API (prediction-market probabilities) + Betfair Exchange API (true market odds with overround near 0) for the broadest free coverage. Add OddsPapi if you need 350+ bookmakers in a single call.

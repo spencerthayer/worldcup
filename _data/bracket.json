@@ -1,0 +1,168 @@
+{
+  "generated_at": "2026-06-11T18:43:42.240533+00:00",
+  "config": {
+    "sims": 50000,
+    "seed": 42,
+    "model": "consensus",
+    "strategy": "ev-bracket",
+    "probabilities": "sim"
+  },
+  "expected_score": 93.23374,
+  "group_placements": {
+    "A": [
+      "Mexico",
+      "South Korea",
+      "Czech Republic",
+      "South Africa"
+    ],
+    "B": [
+      "Switzerland",
+      "Canada",
+      "Bosnia and Herzegovina",
+      "Qatar"
+    ],
+    "C": [
+      "Brazil",
+      "Morocco",
+      "Scotland",
+      "Haiti"
+    ],
+    "D": [
+      "Turkey",
+      "USA",
+      "Paraguay",
+      "Australia"
+    ],
+    "E": [
+      "Germany",
+      "Ecuador",
+      "Ivory Coast",
+      "Curaçao"
+    ],
+    "F": [
+      "Netherlands",
+      "Japan",
+      "Sweden",
+      "Tunisia"
+    ],
+    "G": [
+      "Belgium",
+      "Egypt",
+      "Iran",
+      "New Zealand"
+    ],
+    "H": [
+      "Spain",
+      "Uruguay",
+      "Saudi Arabia",
+      "Cape Verde"
+    ],
+    "I": [
+      "France",
+      "Norway",
+      "Senegal",
+      "Iraq"
+    ],
+    "J": [
+      "Argentina",
+      "Austria",
+      "Algeria",
+      "Jordan"
+    ],
+    "K": [
+      "Portugal",
+      "Colombia",
+      "DR Congo",
+      "Uzbekistan"
+    ],
+    "L": [
+      "England",
+      "Croatia",
+      "Ghana",
+      "Panama"
+    ]
+  },
+  "round_of_32": [
+    "Algeria",
+    "Argentina",
+    "Austria",
+    "Belgium",
+    "Bosnia and Herzegovina",
+    "Brazil",
+    "Canada",
+    "Colombia",
+    "Croatia",
+    "Czech Republic",
+    "Ecuador",
+    "Egypt",
+    "England",
+    "France",
+    "Germany",
+    "Iran",
+    "Ivory Coast",
+    "Japan",
+    "Mexico",
+    "Morocco",
+    "Netherlands",
+    "Norway",
+    "Paraguay",
+    "Portugal",
+    "Scotland",
+    "Senegal",
+    "South Korea",
+    "Spain",
+    "Switzerland",
+    "Turkey",
+    "USA",
+    "Uruguay"
+  ],
+  "round_of_16": [
+    "Argentina",
+    "Belgium",
+    "Brazil",
+    "Canada",
+    "Colombia",
+    "England",
+    "France",
+    "Germany",
+    "Ivory Coast",
+    "Netherlands",
+    "Norway",
+    "Portugal",
+    "Spain",
+    "Switzerland",
+    "Turkey",
+    "USA"
+  ],
+  "quarter_finals": [
+    "Argentina",
+    "Belgium",
+    "Brazil",
+    "Germany",
+    "Ivory Coast",
+    "Netherlands",
+    "Spain",
+    "Switzerland"
+  ],
+  "semi_finals": [
+    "Argentina",
+    "Brazil",
+    "Netherlands",
+    "Spain"
+  ],
+  "finalists": [
+    "Argentina",
+    "Spain"
+  ],
+  "winner": "Argentina",
+  "validation": {
+    "errors": [],
+    "mad_vs_uanalyse": {
+      "r32": 0.062642,
+      "qf": 0.039034,
+      "sf": 0.0259,
+      "final": 0.015215,
+      "champion": 0.008497
+    }
+  }
+}

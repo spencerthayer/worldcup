@@ -1,300 +1,736 @@
-[⚽ WC 2026](https://wc-bracket-challenge.vercel.app/dashboard)
+# World Cup Bracket Generator - Implementation Instructions
+
+This file is the handoff spec for an agent that will build the local Python
+script(s). The goal is to reproduce the statistical bracket analysis locally,
+from the data already in this repository, and output a bracket that maximizes
+expected points for the WC Bracket Challenge format.
+
+Target first script:
+
+```bash
+python3 generate_bracket.py --sims 50000 --seed 42
+```
+
+Acceptable first implementation: one file, `generate_bracket.py`.
+
+If it grows too large, split it into:
+
+| File | Responsibility |
+|---|---|
+| `generate_bracket.py` | CLI orchestration and rendering |
+| `bracket_model.py` | source merge, consensus probabilities, Elo fallback |
+| `bracket_sim.py` | group and knockout Monte Carlo simulation |
+| `bracket_optimize.py` | expected-points bracket optimizer |
+| `bracket_validate.py` | invariants and prior comparison |
+
+Do not change raw data files. The generator may write `_data/bracket.json` and
+`_data/bracket.md`.
+
+---
+
+## 1. What The Script Must Produce
+
+The script must produce a complete bracket:
+
+- ordered 1st/2nd/3rd/4th placement pick for each group A-L,
+- 32 teams picked to reach the knockout bracket,
+- 16 teams picked to reach the Round of 16,
+- 8 teams picked to reach the Quarter-Finals,
+- 4 teams picked to reach the Semi-Finals,
+- 2 finalists,
+- 1 winner.
+
+The bracket must maximize expected challenge points, not simply pick the most
+likely winner of every game.
+
+Expected outputs:
+
+- stdout summary,
+- `_data/bracket.json`,
+- `_data/bracket.md`.
+
+The JSON must contain:
+
+```json
+{
+  "generated_at": "ISO-8601",
+  "config": {
+    "sims": 50000,
+    "seed": 42,
+    "model": "consensus",
+    "strategy": "ev-bracket",
+    "probabilities": "sim"
+  },
+  "expected_score": 0.0,
+  "group_placements": {
+    "A": ["Team 1", "Team 2", "Team 3", "Team 4"]
+  },
+  "round_of_32": [],
+  "round_of_16": [],
+  "quarter_finals": [],
+  "semi_finals": [],
+  "finalists": [],
+  "winner": "",
+  "per_team_probs": {},
+  "validation": {}
+}
+```
+
+---
+
+## 2. Scoring Rules To Optimize
+
+Total possible score is 203.
+
+| Stage | Pick count | Points each | Max |
+|---|---:|---:|---:|
+| Group placement, exact ordered slots | 48 | 1 | 48 |
+| Reach Round of 32 | 32 | 1 | 32 |
+| Reach Round of 16 | 16 | 2 | 32 |
+| Reach Quarter-Finals | 8 | 4 | 32 |
+| Reach Semi-Finals | 4 | 6 | 24 |
+| Reach Final | 2 | 10 | 20 |
+| Champion | 1 | 15 | 15 |
+
+The expected score for a submitted bracket `B` is:
+
+```text
+E[score(B)] =
+  sum_groups sum_positions P(B[group,position] finishes position)
+  + sum_{t in B_R32}   1  * P(t reaches R32)
+  + sum_{t in B_R16}   2  * P(t reaches R16)
+  + sum_{t in B_QF}    4  * P(t reaches QF)
+  + sum_{t in B_SF}    6  * P(t reaches SF)
+  + sum_{t in B_Final} 10 * P(t reaches Final)
+  + 15 * P(B_winner wins tournament)
+```
 
-[spencer](https://wc-bracket-challenge.vercel.app/settings "Edit profile")[☕Support](https://buymeacoffee.com/mattdz "Support the app")Sign out
+The knockout picks must be nested and bracket-feasible:
 
-# Statistical Averages
+```text
+Winner subset Finalists subset SF subset QF subset R16 subset R32
+```
 
-0 pts
+Two teams that meet in the same simulated bracket match cannot both advance past
+that match in the submitted bracket.
 
-Max potential: 203 pts
+---
 
-✏️ Edit Bracket
+## 3. Data Inputs
 
-## Group Stage Placement
+Primary input:
 
-+1pt per correct placement
+```text
+_data/norm/all_odds_normalized.csv
+```
 
-+0pts earned
+Schema:
 
-### Group A
+```text
+source, match_id, home_team, away_team, group, date,
+home_win_prob, draw_prob, away_win_prob,
+home_win_odds, draw_odds, away_win_odds, extra
+```
 
-1st🇲🇽 Mexico
+Normalized sources:
 
-2nd🇰🇷 South Korea
+| Source | Use |
+|---|---|
+| `betexplorer` | group-stage 1X2 bookmaker average |
+| `oddsharvester` | group-stage 1X2 bookmaker average |
+| `uanalyse` | group-stage model probabilities and xG |
+| `worldcup-predictor` | group-stage Elo W/D/L probabilities |
+| `polymarket` | small number of market probabilities, low coverage |
+| `openfootball` | fixtures and full knockout skeleton |
 
-3rd🇨🇿 Czechia
+Supplementary inputs:
 
-4th🇿🇦 South Africa
+| File | Use |
+|---|---|
+| `_data/raw/openfootball/worldcup-2026.json` | authoritative fixture and bracket topology |
+| `_data/raw/hicruben/elo-calibrated.json` | Elo ratings for fallback match probabilities |
+| `_data/raw/uanalyse/latest/tournament_probabilities.csv` | validation priors and optional blend |
+| `_data/raw/uanalyse/latest/match_predictions.csv` | xG for optional Poisson score model |
+| `_data/raw/worldcup-predictor/wc2026_predictions.csv` | extra Elo and neutral-site metadata |
 
-### Group B
+The generator must read the bracket skeleton from `worldcup-2026.json`; do not
+hard-code the bracket except as a validation assertion.
 
-1st🇨🇭 Switzerland
+---
 
-2nd🇨🇦 Canada
+## 4. Team Canonicalization
 
-3rd🇧🇦 Bosnia & Herzegovina
+Reuse the intent of `normalize_data.py` aliases. The generator must canonicalize
+team names before joining sources.
 
-4th🇶🇦 Qatar
+Required aliases include:
 
-### Group C
+| Variant | Canonical |
+|---|---|
+| `United States` | `USA` |
+| `Czechia` | `Czech Republic` |
+| `Bosnia-Herzegovina` | `Bosnia and Herzegovina` |
+| `Bosnia & Herzegovina` | `Bosnia and Herzegovina` |
+| `Turkiye`, `Türkiye`, `Trkiye` | `Turkey` |
+| `Curaçao`, `Curacao`, `Curaao` | `Curaçao` |
+| `DR Congo`, `Congo DR`, `Democratic Republic of the Congo` | `DR Congo` |
+| `Cote d'Ivoire`, `Ivory Coast` | `Ivory Coast` |
 
-1st🇧🇷 Brazil
+Implementation requirement:
 
-2nd🇲🇦 Morocco
+```python
+def nteam(name: str) -> str:
+    """Return canonical team name."""
+```
 
-3rd🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland
+Also implement:
 
-4th🇭🇹 Haiti
+```python
+def match_key(team_a: str, team_b: str) -> tuple[str, str]:
+    """Return sorted canonical pair."""
+```
 
-### Group D
+Do not join sources on `match_id` alone. Home/away orientation can flip between
+neutral-venue sources.
 
-1st🇺🇸 United States
+---
 
-2nd🇹🇷 Turkey
+## 5. Consensus Match Probability Model
 
-3rd🇵🇾 Paraguay
+Build:
 
-4th🇦🇺 Australia
+```python
+def match_probs(team_a: str, team_b: str) -> tuple[float, float, float]:
+    """
+    Return P(team_a regulation win), P(draw), P(team_b regulation win).
+    Uses consensus group-stage probabilities when available, otherwise Elo.
+    """
+```
 
-### Group E
+### 5.1 Source weighting
 
-1st🇩🇪 Germany
+Default weights:
 
-2nd🇪🇨 Ecuador
+```python
+SOURCE_WEIGHTS = {
+    "betexplorer": 0.30,
+    "oddsharvester": 0.25,
+    "polymarket": 0.20,
+    "uanalyse": 0.15,
+    "worldcup-predictor": 0.10,
+}
+```
 
-3rd🇨🇮 Ivory Coast
+For each match key `k = sorted(team_i, team_j)`, align every source row to the
+same sorted orientation.
 
-4th🇨🇼 Curaçao
+For source `s`:
 
-### Group F
+```text
+p_s = [P_s(k_1 wins), P_s(draw), P_s(k_2 wins)]
+w_s = SOURCE_WEIGHTS[s]
+```
 
-1st🇳🇱 Netherlands
+Merge:
 
-2nd🇯🇵 Japan
+```text
+P_k = sum_s(w_s * p_s) / sum_s(w_s)
+P_k = P_k / sum(P_k)
+```
 
-3rd🇸🇪 Sweden
+Skip a source row if any probability is missing or non-finite. If the triple
+sums close to 1, keep it. If it sums to something positive but not exactly 1,
+renormalize once. Do not remove bookmaker vig again; the normalized CSV already
+stores fair probabilities.
 
-4th🇹🇳 Tunisia
+### 5.2 Elo fallback
 
-### Group G
+For unpriced pairings, use Elo from `_data/raw/hicruben/elo-calibrated.json`.
 
-1st🇧🇪 Belgium
+For teams `i` and `j`:
 
-2nd🇪🇬 Egypt
+```text
+q_i = 1 / (1 + 10 ** (-(R_i - R_j) / 400))
+q_j = 1 - q_i
+```
 
-3rd🇮🇷 Iran
+Convert this to regulation W/D/L:
 
-4th🇳🇿 New Zealand
+```text
+draw = clamp(0.26 - 0.04 * abs(R_i - R_j) / 400, 0.18, 0.30)
+P(i wins regulation) = (1 - draw) * q_i
+P(draw)              = draw
+P(j wins regulation) = (1 - draw) * q_j
+```
 
-### Group H
+If a team is missing from Elo, use rating `1650`.
 
-1st🇪🇸 Spain
+### 5.3 Knockout advancement
 
-2nd🇺🇾 Uruguay
+Knockout matches cannot end in draws. Convert regulation W/D/L to advancement:
 
-3rd🇨🇻 Cape Verde
+```text
+shootout_i = 0.5 + 0.20 * (q_i - 0.5)
+P(i advances) = P(i regulation win) + P(draw) * shootout_i
+P(j advances) = 1 - P(i advances)
+```
 
-4th🇸🇦 Saudi Arabia
+A simpler first version may use `shootout_i = 0.5`, but keep the function
+isolated so it can be calibrated later.
 
-### Group I
+Implement:
 
-1st🇫🇷 France
+```python
+def advance_prob(team_a: str, team_b: str) -> float:
+    """Return P(team_a advances over team_b)."""
+```
 
-2nd🇳🇴 Norway
+---
 
-3rd🇸🇳 Senegal
+## 6. Optional Poisson Scoreline Model
 
-4th🇮🇶 Iraq
+The default model can simulate W/D/L and synthesize tie-breaker scores. Add a
+`--model poisson` option if time allows.
 
-### Group J
+If xG exists for a group match:
 
-1st🇦🇷 Argentina
+```text
+G_i ~ Poisson(lambda_i)
+G_j ~ Poisson(lambda_j)
+```
 
-2nd🇦🇹 Austria
+Score probability:
 
-3rd🇩🇿 Algeria
+```text
+P(G_i=a, G_j=b) =
+  exp(-lambda_i) * lambda_i^a / a!
+  * exp(-lambda_j) * lambda_j^b / b!
+```
 
-4th🇯🇴 Jordan
+Use score support `0..10`. Add any probability tail to 10 goals.
 
-### Group K
+Implied W/D/L:
 
-1st🇵🇹 Portugal
+```text
+P(i wins) = sum_{a>b} P(a,b)
+P(draw)   = sum_{a=b} P(a,b)
+P(j wins) = sum_{a<b} P(a,b)
+```
 
-2nd🇨🇴 Colombia
+If xG is unavailable:
 
-3rd🇨🇩 DR Congo
+```text
+total_goals = 2.55
+lambda_i = max(0.2, total_goals * q_i)
+lambda_j = max(0.2, total_goals * (1 - q_i))
+```
 
-4th🇺🇿 Uzbekistan
+Do not make Poisson the default until its output is validated against the market
+probabilities.
 
-### Group L
+---
 
-1st🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
+## 7. Group-Stage Simulation
 
-2nd🇭🇷 Croatia
+Simulate the complete group stage inside each Monte Carlo iteration.
 
-3rd🇬🇭 Ghana
+For each group, initialize per-team state:
 
-4th🇵🇦 Panama
+```text
+points = 0
+goals_for = 0
+goals_against = 0
+goal_difference = goals_for - goals_against
+```
 
-## Advance to Knockout Bracket
+For every group fixture in `openfootball`:
 
-+1pt per team correctly picked to advance
+1. get `match_probs(team_a, team_b)`,
+2. sample home win / draw / away win,
+3. add points,
+4. produce a scoreline for tie-breakers.
 
-+0pts earned
+If not using Poisson, synthesize tie-breaker scores:
 
-🇲🇽 Mexico
+```text
+draw score: choose from [0-0, 1-1, 1-1, 2-2]
+win margin: 1 + Bernoulli(0.28) + Bernoulli(0.10)
+loser goals: choose from [0, 1, 1, 2]
+winner goals: loser goals + margin
+```
 
-🇨🇭 Switzerland
+Rank each group by:
 
-🇧🇷 Brazil
+1. points,
+2. goal difference,
+3. goals scored,
+4. head-to-head mini-table if implemented,
+5. Elo rating,
+6. seeded random tie-breaker.
 
-🇺🇸 United States
+Record indicators for each simulation `m`:
 
-🇩🇪 Germany
+```text
+I_m(team finishes 1st)
+I_m(team finishes 2nd)
+I_m(team finishes 3rd)
+I_m(team finishes 4th)
+I_m(team reaches R32)
+```
 
-🇳🇱 Netherlands
+After `N` simulations:
 
-🇧🇪 Belgium
+```text
+P_hat(team finishes position r) =
+  (1 / N) * sum_m I_m(team finishes position r)
 
-🇪🇸 Spain
+P_hat(team reaches R32) =
+  (1 / N) * sum_m I_m(team reaches R32)
+```
 
-🇫🇷 France
+Standard error:
 
-🇦🇷 Argentina
+```text
+SE(P_hat) = sqrt(P_hat * (1 - P_hat) / N)
+```
 
-🇵🇹 Portugal
+At `N = 50000`, worst-case standard error is about `0.00224`.
 
-🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
+---
 
-🇰🇷 South Korea
+## 8. Third-Place Qualification And Slot Assignment
 
-🇨🇦 Canada
+There are 12 third-place teams. Eight qualify for the Round of 32.
 
-🇲🇦 Morocco
+Within each simulation, rank third-place teams by:
 
-🇹🇷 Turkey
+1. points,
+2. goal difference,
+3. goals scored,
+4. Elo rating, because fair-play data is unavailable,
+5. seeded random tie-breaker.
 
-🇪🇨 Ecuador
+The top eight qualify.
 
-🇯🇵 Japan
+Implement one isolated function:
 
-🇪🇬 Egypt
+```python
+def assign_thirds(qualified_thirds, bracket_slots, method="greedy"):
+    """
+    Return mapping from third-place slot match number to team.
+    This is the only place where the third-place allocation rule lives.
+    """
+```
 
-🇺🇾 Uruguay
+Correct future behavior:
 
-🇳🇴 Norway
+```text
+Use the official FIFA allocation table:
+qualified group set -> assignment of groups to 3X slots.
+```
 
-🇦🇹 Austria
+Current fallback:
 
-🇨🇴 Colombia
+```text
+For each 3X slot in Round-of-32 match order:
+    choose the strongest unassigned qualified third-place team whose group
+    is allowed by that slot placeholder.
+```
 
-🇭🇷 Croatia
+Use the within-iteration third-place ranking as "strongest", not global Elo.
 
-🇩🇿 Algeria
+---
 
-🇧🇦 Bosnia & Herzegovina
+## 9. Knockout Simulation
 
-🇨🇮 Ivory Coast
+Use the knockout matches from `worldcup-2026.json`.
 
-🇨🇿 Czechia
+Slot resolution:
 
-🇵🇾 Paraguay
+```text
+1A, 2A, ..., 1L, 2L -> simulated group placements
+3A/B/C/...          -> assigned third-place qualifier
+W74, W75, ...       -> winner of previous knockout match
+```
 
-🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland
+Round mapping:
 
-🇸🇳 Senegal
+```text
+matches 73-88  -> Round of 32
+matches 89-96  -> Round of 16
+matches 97-100 -> Quarter-Finals
+matches 101-102 -> Semi-Finals
+Final           -> W101 vs W102
+```
 
-🇸🇪 Sweden
+For every knockout match:
 
-## Advance to Round of 16
+```text
+p = advance_prob(team_a, team_b)
+u = Uniform(0, 1)
+winner = team_a if u < p else team_b
+```
 
-+2pts per correct pick
+Record indicators:
 
-+0pts earned
+```text
+R32 participant: seeded into matches 73-88
+R16 participant: winners of 73-88
+QF participant:  winners of 89-96
+SF participant:  winners of 97-100
+Finalist:        winners of 101-102
+Champion:        winner of Final
+```
 
-🇨🇦 Canada
+After `N` simulations:
 
-🇩🇪 Germany
+```text
+P_hat(team reaches stage S) =
+  (1 / N) * sum_m I_m(team reaches stage S)
+```
 
-🇳🇱 Netherlands
+Assert monotonicity:
 
-🇧🇷 Brazil
+```text
+P(R32) >= P(R16) >= P(QF) >= P(SF) >= P(Final) >= P(Champion)
+```
 
-🇫🇷 France
+---
 
-🇳🇴 Norway
+## 10. Validation Against UAnalyse Priors
 
-🇲🇽 Mexico
+Load:
 
-🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
+```text
+_data/raw/uanalyse/latest/tournament_probabilities.csv
+```
 
-🇺🇸 United States
+Compare simulation probabilities to priors for:
 
-🇧🇪 Belgium
+```text
+prob_reach_round_of_32
+prob_reach_quarterfinals
+prob_reach_semifinals
+prob_reach_final
+prob_champion
+```
 
-🇨🇴 Colombia
+Mean absolute deviation:
 
-🇪🇸 Spain
+```text
+MAD(stage) =
+  (1 / teams) * sum_t abs(P_sim(t, stage) - P_prior(t, stage))
+```
 
-🇨🇭 Switzerland
+Also report Spearman rank correlation by stage if easy to implement.
 
-🇦🇷 Argentina
+Optional probability blend for optimizer:
 
-🇵🇹 Portugal
+```text
+P_blend(t, stage) =
+  alpha_stage * P_sim(t, stage)
+  + (1 - alpha_stage) * P_prior(t, stage)
+```
 
-🇹🇷 Turkey
+Recommended first-pass `alpha_stage`:
 
-## Advance to Quarter-Finals
+| Stage | Alpha |
+|---|---:|
+| R32 | 0.80 |
+| R16 | 1.00 |
+| QF | 0.65 |
+| SF | 0.60 |
+| Final | 0.55 |
+| Champion | 0.55 |
 
-+4pts per correct pick
+There is no UAnalyse R16 prior. Use simulation-only for R16.
 
-+0pts earned
+If blending is used, enforce monotonicity afterward by clipping deeper-stage
+probabilities to the previous stage.
 
-🇳🇱 Netherlands
+The first implementation may optimize with simulation-only probabilities, but
+the report must show validation deltas.
 
-🇩🇪 Germany
+---
 
-🇧🇷 Brazil
+## 11. Pick Optimization
 
-🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
+### 11.1 Group placement optimizer
 
-🇪🇸 Spain
+For every group `g`, build a 4x4 matrix:
 
-🇧🇪 Belgium
+```text
+M[team, position] = P(team finishes position)
+```
 
-🇦🇷 Argentina
+Choose the ordered placement that maximizes expected group-placement points:
 
-🇵🇹 Portugal
+```text
+best_order_g =
+  argmax permutation pi of the 4 teams
+    sum_{position=1..4} M[pi[position], position]
+```
 
-## Advance to Semi-Finals
+Implement by brute force over `4! = 24` permutations.
 
-+6pts per correct pick
+### 11.2 Knockout bracket optimizer
 
-+0pts earned
+Do not independently pick top teams per stage; that can create impossible
+brackets. The selected knockout picks must come from one filled bracket.
 
-🇩🇪 Germany
+Acceptable first-pass optimizer:
 
-🇪🇸 Spain
+1. Choose deterministic group seeds from the optimized group placements.
+2. Choose deterministic third-place qualifiers using the highest R32 or
+   third-place qualification probabilities.
+3. Fill the Round-of-32 bracket.
+4. For each knockout match, choose the advancing team with higher downstream
+   expected value, not just higher one-match win probability.
 
-🇧🇷 Brazil
+For a candidate filled bracket `b`:
 
-🇦🇷 Argentina
+```text
+EV_knockout(b) =
+  sum_{t in b_R32}   1  * P(t reaches R32)
+  + sum_{t in b_R16} 2  * P(t reaches R16)
+  + sum_{t in b_QF}  4  * P(t reaches QF)
+  + sum_{t in b_SF}  6  * P(t reaches SF)
+  + sum_{t in b_F}   10 * P(t reaches Final)
+  + 15 * P(b_champion wins tournament)
+```
 
-## Finalist
+Better optimizer if time allows:
 
-+10pts per correct pick
+1. Extract the top `K=25` most common Round-of-32 seed maps from simulations.
+2. For each seed map, enumerate or dynamically optimize feasible winner choices.
+3. Score each filled bracket by expected points.
+4. Keep the global max.
 
-+0pts earned
+Champion/finalist coupling matters because those picks are worth 15 and 10
+points. Explicitly evaluate at least the top 10 champion candidates by
+`P(champion)` and find the best feasible bracket conditioned on each candidate
+winning.
 
-🇪🇸 Spain
+---
 
-🇧🇷 Brazil
+## 12. Required CLI
 
-## Winner
+Use `argparse`.
 
-+15pts
+```bash
+python3 generate_bracket.py \
+  --sims 50000 \
+  --seed 42 \
+  --model consensus \
+  --strategy ev-bracket \
+  --probabilities sim \
+  --out _data/bracket.json
+```
 
-+0pts earned
+Options:
 
-🇪🇸 Spain
+| Option | Values | Default |
+|---|---|---|
+| `--sims` | positive int | `50000` |
+| `--seed` | int | `42` |
+| `--model` | `consensus`, `elo`, `poisson` | `consensus` |
+| `--strategy` | `ev-bracket`, `greedy` | `ev-bracket` |
+| `--probabilities` | `sim`, `blend` | `sim` |
+| `--out` | path | `_data/bracket.json` |
+| `--dry-run` | flag | false |
 
+The same seed and inputs must produce identical output.
+
+---
+
+## 13. Rendering Requirements
+
+The markdown report should include:
+
+- model config,
+- source weights,
+- number of simulations,
+- expected score out of 203,
+- group placement table with probabilities,
+- R32/R16/QF/SF/finalist/winner picks,
+- per-stage expected point contribution,
+- top champion probabilities,
+- validation MAD against UAnalyse priors,
+- known data issues.
+
+Round probabilities should be rounded to one decimal percentage point. Expected
+points should be rounded to two decimals.
+
+Known data issues to call out:
+
+- `Bosnia & Herzegovina` must canonicalize to `Bosnia and Herzegovina`.
+- `Curaao` must canonicalize to `Curaçao`.
+- Polymarket slugs should not be trusted unless the teams in the slug match the
+  parsed teams.
+- Exact FIFA 2026 third-place allocation table is not present yet; fallback must
+  be documented in output.
+
+---
+
+## 14. Invariants And Tests
+
+Minimum assertions:
+
+- every group placement is a permutation of exactly four teams,
+- exactly 32 R32 picks,
+- exactly 16 R16 picks,
+- exactly 8 QF picks,
+- exactly 4 SF picks,
+- exactly 2 finalists,
+- exactly 1 winner,
+- nested stage sets are valid,
+- winner is one of the finalists,
+- finalist teams are among semi-finalists,
+- no impossible same-match co-advancement in the filled bracket,
+- probabilities are finite and in `[0,1]`,
+- per-team stage probabilities are monotonic:
+  `R32 >= R16 >= QF >= SF >= Final >= Champion`,
+- perfect oracle scoring function returns 203.
+
+Dry run should:
+
+1. load all inputs,
+2. canonicalize teams,
+3. build consensus probabilities,
+4. parse bracket skeleton,
+5. validate no missing group fixtures,
+6. print data quality warnings,
+7. exit without simulating.
+
+---
+
+## 15. Prototype Analysis To Reproduce
+
+I ran a prototype of this analysis in-memory using:
+
+```text
+sims = 50000
+seed = 42
+model = consensus for group-stage priced matches
+fallback = Elo for unpriced knockout pairings
+third-place assignment = greedy fallback
+```
+
+The future script does not need to hard-code these results, but it should be able
+to reproduce a similar report from the current data.
+
+Prototype validation against UAnalyse priors was approximately:
+
+| Stage | MAD |
+|---|---:|
+| R32 | 0.063 |
+| QF | 0.050 |
+| SF | 0.033 |
+| Final | 0.019 |
+| Champion | 0.011 |
+
+The prototype's highest expected-points final was Spain vs Argentina with Spain
+as champion. Treat that as a regression smoke test, not as a required hard-coded
+answer. If the final implementation changes because of better third-place
+allocation, Poisson tie-breakers, or probability blending, explain the delta in
+the generated report.

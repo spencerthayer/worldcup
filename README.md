@@ -1,112 +1,222 @@
-# 2026 World Cup — Odds & Bracket Analysis
+# 2026 World Cup — Odds, Data Pipeline & Monte Carlo Bracket
 
-Analysis of the 2026 FIFA World Cup based on average BetExplorer odds from the
-[kubeia.io calendar](https://calendar.kubeia.io/world-cup-with-alarm-with-score-tv-united-states-of-america-the.ics).
+A complete pipeline for scraping World Cup odds from multiple open sources, normalizing them into a consensus probability model, and running Monte Carlo simulations to produce an optimized bracket for the WC Bracket Challenge (maximizing expected points out of 203).
 
-## What's here
+## Repository structure
 
-| File | Description |
+| Path | Description |
 |---|---|
-| `parse_calendar.py` | Main script — downloads the ICS calendar, parses all matches, computes odds spreads, wild card analysis, and full bracket picks |
-| `world-cup-calendar.ics` | Cached copy of the ICS calendar (auto-downloaded on first run) |
+| `generate_bracket.py` | **Main bracket generator** — Monte Carlo simulation + optimization |
+| `normalize_data.py` | Normalizes raw odds from all sources into a common schema |
+| `parse_calendar.py` | Legacy script — downloads ICS calendar, simple expected-points model |
+| `download_data.py` | Downloads raw data from all sources into `_data/raw/` |
+| `scrape_all.py` | Scrapes OddsPortal via OddsHarvester + Playwright for other sources |
+| `_data/raw/` | Raw data from 8+ sources (JSON, CSV, HTML, ICS) |
+| `_data/norm/all_odds_normalized.csv` | Normalized consensus odds (398 rows, 6 sources) |
+| `_data/bracket.json` | Full machine-readable bracket output |
+| `_data/bracket.csv` | Tidy 111-row pick table for spreadsheets |
+| `_data/bracket.md` | Human-readable bracket report |
+| `brackets_info.md` | Detailed spec for the bracket generator |
+
+## Pipeline overview
+
+```
+┌─────────────────┐     ┌──────────────┐     ┌───────────────┐     ┌──────────────┐
+│  Scrape / fetch  │────▶│  _data/raw/  │────▶│  normalize_   │────▶│ _data/norm/  │
+│  odds from 8+    │     │  per-source  │     │  data.py      │     │ all_odds_    │
+│  open sources    │     │  raw files   │     │               │     │ normalized   │
+└─────────────────┘     └──────────────┘     └───────────────┘     └──────┬───────┘
+                                                                         │
+                                                                         ▼
+┌─────────────────┐     ┌──────────────┐     ┌───────────────┐     ┌──────────────┐
+│  _data/bracket   │◀────│  Optimize    │◀────│  Monte Carlo  │◀────│  Consensus   │
+│  .json/.csv/.md  │     │  bracket     │     │  simulation   │     │  probability │
+│                  │     │  picks       │     │  (50K iters)  │     │  model       │
+└─────────────────┘     └──────────────┘     └───────────────┘     └──────────────┘
+```
 
 ## Quick start
 
 ```bash
-python3 parse_calendar.py
+# 1. Install dependencies
+pip install playwright
+python3 -m playwright install chromium
+
+# 2. Download and normalize all data
+python3 download_data.py
+python3 normalize_data.py
+
+# 3. Generate the bracket (50K simulations, ~20 seconds)
+python3 generate_bracket.py --sims 50000 --seed 42
+
+# 4. View results
+cat _data/bracket.md
 ```
 
-The script will:
+## Results (50,000 simulations)
 
-1. Download the ICS calendar (if not already cached)
-2. Print the **odds spread for all 12 groups** (implied win/draw/loss probabilities)
-3. Print the **full knockout bracket structure** with dates
-4. Print the **wild card analysis** (which 3rd-place teams are most likely to qualify)
-5. Print the **full bracket picks** from Round of 32 through the Final
+| Metric | Value |
+|---|---|
+| **Expected Score** | **93.23 / 203** |
+| **Champion** | **Argentina** (15.1%) |
+| **Final** | Argentina vs Spain |
 
-## Methodology
+Top champion probabilities: Spain 16.8%, Argentina 15.1%, France 12.7%, Brazil 8.5%, England 7.9%.
 
-### Odds parsing
+Validation against UAnalyse priors (mean absolute deviation): R32=0.063, QF=0.039, SF=0.026, Final=0.015, Champion=0.009.
 
-- Average BetExplorer decimal odds (Home Win / Draw / Away Win) are extracted from each match's ICS description.
-- **Implied probability** = `1 / decimal_odds`
-- **Overround** (bookmaker margin) is removed to get fair probabilities:
-  `fair_prob = implied_prob / (1 + overround)`
-- **Expected points** per match = `win_prob * 3 + draw_prob * 1`
+---
 
-### Group standings
+## Data pipeline
 
-Teams are ranked by expected points across their 3 group matches. This gives projected 1st, 2nd, and 3rd place per group.
+### Step 1: Scrape
 
-### Wild card qualification
+Data is collected from 8+ open sources using a combination of direct HTTP, the OddsHarvester Playwright scraper (for OddsPortal), and the Polymarket Gamma API:
 
-- 12 groups, 8 wild card slots for 3rd-place teams
-- Each slot draws from a specific subset of groups (FIFA bracket rules)
-- Groups are ranked by their projected 3rd-place team's expected points
-- Wild card slots are assigned greedily: strongest available 3rd-place team to first eligible slot
+| Source | Method | Coverage |
+|---|---|---|
+| **BetExplorer** | ICS calendar embed | 72 group matches, avg of 30+ bookmakers |
+| **OddsHarvester** | Playwright → OddsPortal | 72 group matches, per-bookmaker odds |
+| **Polymarket** | Gamma API | 6 matches with 3-outcome markets |
+| **uanalyse** | GitHub raw CSV | 72 match probs + xG + tournament priors |
+| **worldcup-predictor** | GitHub raw CSV | 72 Elo-based W/D/L probabilities |
+| **openfootball** | GitHub raw JSON | Full 104-match fixture + bracket skeleton |
+| **hicruben** | GitHub raw JSON | Elo ratings for 54 teams |
 
-### Bracket picks
+### Step 2: Normalize
 
-- Every knockout match is decided by comparing the two teams' expected points from group stage
-- Higher expected points = pick to win
-- Wild card teams are assigned to slots before bracket simulation begins
+`normalize_data.py` canonicalizes team names (70+ aliases), converts all sources to a common schema, and computes implied probabilities from decimal odds:
 
-## Key findings
-
-### Group favorites
-
-| Group | 1st | 2nd | 3rd |
-|---|---|---|---|
-| A | Mexico | South Korea | Czech Republic |
-| B | Switzerland | Canada | Bosnia and Herzegovina |
-| C | Brazil | Morocco | Scotland |
-| D | USA | Turkey | Paraguay |
-| E | Germany | Ecuador | Ivory Coast |
-| F | Netherlands | Japan | Sweden |
-| G | Belgium | Egypt | Iran |
-| H | Spain | Uruguay | Cape Verde |
-| I | France | Norway | Senegal |
-| J | Argentina | Austria | Algeria |
-| K | Portugal | Colombia | DR Congo |
-| L | England | Croatia | Ghana |
-
-### Wild card picks (8 of 12)
-
-| Group | 3rd Place Team | Exp Pts | WC Paths |
-|---|---|---|---|
-| E | Ivory Coast | 1.45 | 7 |
-| I | Senegal | 1.32 | 6 |
-| A | Czech Republic | 1.31 | 2 |
-| B | Bosnia and Herzegovina | 1.24 | 2 |
-| J | Algeria | 1.23 | 5 |
-| C | Scotland | 1.23 | 3 |
-| D | Paraguay | 1.23 | 3 |
-| F | Sweden | 1.22 | 5 |
-
-### Bracket result
-
-**Champion: Spain**
-
-Path: Austria → Colombia → Belgium → Germany → Brazil (Final)
-
-## Customization
-
-To change wild card picks, edit the `wild_card_picks` dict in `main()`:
-
-```python
-wild_card_picks: dict[str, str] = {
-    "A": "Czech Republic",
-    "B": "Bosnia and Herzegovina",
-    "C": "Scotland",
-    "D": "Paraguay",
-    "E": "Ivory Coast",
-    "F": "Sweden",
-    "I": "Senegal",
-    "J": "Algeria",
-}
+```
+source, match_id, home_team, away_team, group, date,
+home_win_prob, draw_prob, away_win_prob,
+home_win_odds, draw_odds, away_win_odds, extra
 ```
 
-To change bracket picks, modify the `pick_winner()` function or override individual match results in `print_bracket()`.
+The normalized file has 398 rows across 6 sources covering 119 unique matches.
+
+---
+
+## Mathematical model
+
+### Consensus probability model
+
+For each group-stage match, we compute a weighted consensus from all available sources. For match key $k = (t_1, t_2)$ with $t_1 < t_2$ (alphabetical), each source $s$ contributes:
+
+$$p_s = [P_s(t_1 \text{ wins}),\; P_s(\text{draw}),\; P_s(t_2 \text{ wins})]$$
+
+with source weight $w_s$. The consensus is the weighted average, renormalized:
+
+$$P_k = \frac{\sum_s w_s \cdot p_s}{\sum_s w_s}, \quad \hat{P}_k = \frac{P_k}{\sum P_k}$$
+
+A source is skipped if any probability is missing or non-finite. Default weights:
+
+| Source | Weight | Rationale |
+|---|---|---|
+| betexplorer | 0.30 | Broadest bookmaker average (30+) |
+| oddsharvester | 0.25 | Per-bookmaker OddsPortal scrape |
+| polymarket | 0.20 | Prediction market (wisdom of crowd) |
+| uanalyse | 0.15 | Model-based + xG |
+| worldcup-predictor | 0.10 | Elo-based |
+
+### Elo fallback
+
+For knockout pairings not covered by group-stage odds, we fall back to Elo ratings from [hicruben/world-cup-2026-prediction-model](https://github.com/Hicruben/world-cup-2026-prediction-model). For teams $i$ and $j$ with ratings $R_i, R_j$:
+
+$$q_i = \frac{1}{1 + 10^{-(R_i - R_j)/400}}$$
+
+This win probability is converted to regulation W/D/L using a draw probability that decreases with rating difference:
+
+$$\text{draw} = \text{clamp}\bigl(0.26 - 0.04 \times \frac{|R_i - R_j|}{400},\; 0.18,\; 0.30\bigr)$$
+
+$$P(i \text{ wins}) = (1 - \text{draw}) \times q_i$$
+$$P(\text{draw}) = \text{draw}$$
+$$P(j \text{ wins}) = (1 - \text{draw}) \times q_j$$
+
+Missing teams receive a default rating of 1650.
+
+### Knockout advancement
+
+Knockout matches cannot end in draws. The advancement probability converts regulation W/D/L into a single advance/loss outcome:
+
+$$P(i \text{ advances}) = P(i \text{ reg. win}) + P(\text{draw}) \times \sigma_i$$
+
+where the shootout advantage is:
+
+$$\sigma_i = 0.5 + 0.20 \times (q_i - 0.5)$$
+
+This gives a slight edge to the stronger team in penalty shootouts.
+
+### Group-stage simulation
+
+Each Monte Carlo iteration simulates all 72 group matches. For each match, we sample from the consensus W/D/L distribution. Tie-breaker scores are synthesized:
+
+- **Draw**: randomly chosen from $\{(0,0), (1,1), (1,1), (2,2)\}$
+- **Win margin**: $1 + \text{Bernoulli}(0.28) + \text{Bernoulli}(0.10)$
+- **Loser goals**: randomly chosen from $\{0, 1, 1, 2\}$
+- **Winner goals**: loser goals + margin
+
+Groups are ranked by: (1) points, (2) goal difference, (3) goals scored, (4) Elo rating, (5) seeded random.
+
+### Third-place qualification
+
+Twelve third-place teams compete for 8 Round of 32 slots. Within each simulation, third-place teams are ranked by points, GD, GS, Elo, and random. The top 8 are assigned to slots using a **backtracking algorithm** with most-constrained-first ordering — this is necessary because a simple greedy approach fails to find valid complete assignments for this slot topology.
+
+### Monte Carlo estimation
+
+After $N = 50{,}000$ iterations, probabilities are estimated as:
+
+$$\hat{P}(\text{team reaches stage } S) = \frac{1}{N} \sum_{m=1}^{N} \mathbf{1}_m(\text{team reaches } S)$$
+
+The standard error is bounded by:
+
+$$\text{SE}(\hat{P}) \leq \sqrt{\frac{0.25}{N}} \approx 0.00224$$
+
+### Bracket optimization
+
+The bracket must maximize expected challenge points, not simply pick the most likely winner of every game. The scoring system (203 points total):
+
+| Stage | Picks | Points each | Max |
+|---|---:|---:|---:|
+| Group placement (exact ordered slots) | 48 | 1 | 48 |
+| Reach Round of 32 | 32 | 1 | 32 |
+| Reach Round of 16 | 16 | 2 | 32 |
+| Reach Quarter-Finals | 8 | 4 | 32 |
+| Reach Semi-Finals | 4 | 6 | 24 |
+| Reach Final | 2 | 10 | 20 |
+| Champion | 1 | 15 | 15 |
+
+The expected score for a bracket $B$ is:
+
+$$E[\text{score}(B)] = \sum_{\text{groups } g} \sum_{\text{positions } r} P(B[g,r] \text{ finishes } r) \cdot 1$$
+$$+ \sum_{t \in B_{\text{R32}}} 1 \cdot P(t \text{ reaches R32})$$
+$$+ \sum_{t \in B_{\text{R16}}} 2 \cdot P(t \text{ reaches R16})$$
+$$+ \sum_{t \in B_{\text{QF}}} 4 \cdot P(t \text{ reaches QF})$$
+$$+ \sum_{t \in B_{\text{SF}}} 6 \cdot P(t \text{ reaches SF})$$
+$$+ \sum_{t \in B_{\text{F}}} 10 \cdot P(t \text{ reaches Final})$$
+$$+ 15 \cdot P(B_{\text{winner}} \text{ wins tournament})$$
+
+**Group placements** are optimized by brute force over all $4! = 24$ permutations per group, picking the ordering that maximizes expected placement points.
+
+**Knockout picks** are filled deterministically: optimized group seeds are placed into the bracket skeleton, third-place teams are assigned via backtracking, and each knockout match is decided by the team with higher advancement probability. The picks are constrained to be nested: $\text{Winner} \subset \text{Finalists} \subset \text{SF} \subset \text{QF} \subset \text{R16} \subset \text{R32}$.
+
+---
+
+## CLI reference
+
+```bash
+python3 generate_bracket.py \
+  --sims 50000 \        # Number of Monte Carlo iterations (default: 50000)
+  --seed 42 \           # Random seed for reproducibility (default: 42)
+  --model consensus \   # Probability model: consensus, elo, poisson (default: consensus)
+  --strategy ev-bracket \ # Optimization: ev-bracket, greedy (default: ev-bracket)
+  --probabilities sim \ # Probability source: sim, blend (default: sim)
+  --out _data/bracket \ # Output path stem (default: _data/bracket)
+  --formats csv,json,md \ # Output formats (default: all three)
+  --dry-run             # Validate data without simulating
+```
+
+---
 
 ## Odds data sources
 

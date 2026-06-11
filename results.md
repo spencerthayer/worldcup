@@ -1,6 +1,6 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-06-11T21:14:51.669666+00:00
+**Last updated:** 2026-06-11T21:33:18.490898+00:00
 
 ## 🎯 Summary
 
@@ -10,20 +10,20 @@
 
 ## 📈 Scoring Summary
 
-**Current Score: 37 / 203 (18.2%)**
+**Current Score: 1 / 203 (0.5%)**
 
-**Accuracy: 37/91 correct (40.7%)**
+**Accuracy: 1/4 correct (25.0%)**
 
 | Stage | Correct | Pts/Pick | Max | Pts Earned |
 |:---|:---:|:---:|:---:|:---:|
-| Group Placement | 16/48 | 1 | 48 | **16** |
-| Advance to Knockout | 21/32 | 1 | 32 | **21** |
+| Group Placement | 1/4 | 1 | 48 | **1** |
+| Advance to Knockout | 0/0 (+32 pending) | 1 | 32 | **0** |
 | Advance to R16 | 0/0 (+16 pending) | 2 | 32 | **0** |
 | Advance to QF | 0/0 (+8 pending) | 4 | 32 | **0** |
 | Advance to SF | 0/0 (+4 pending) | 6 | 24 | **0** |
 | Finalist | 0/0 (+2 pending) | 10 | 20 | **0** |
 | Winner | 0/0 (+5 pending) | 15 | 15 | **0** |
-| **Total** | | | **203** | **37** |
+| **Total** | | | **203** | **1** |
 
 ## 📊 Group Placements
 

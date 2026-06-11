@@ -424,7 +424,13 @@ def per_team_probs(sim):
     teams=set()
     for stage in ["r32","r16","qf","sf","final","champion"]:
         teams.update(sim.get(stage,{}).keys())
-    return {t:{stage:round(sim.get(stage,{}).get(t,0),6) for stage in ["r32","r16","qf","sf","final","champion"]} for t in sorted(teams)}
+    placement = sim.get("placement", {})
+    result = {}
+    for t in sorted(teams):
+        result[t] = {stage:round(sim.get(stage,{}).get(t,0),6) for stage in ["r32","r16","qf","sf","final","champion"]}
+        if t in placement:
+            result[t]["placement"] = {str(k):round(v,6) for k,v in placement[t].items()}
+    return result
 
 def render_json(result,path):
     with open(path,"w",encoding="utf-8") as f: json.dump(result,f,indent=2,ensure_ascii=False)
@@ -547,7 +553,7 @@ def main():
     for e in errs: print(f"  ERROR: {e}")
     if not errs: print("  All invariants passed.")
     mad=compute_mad(sim,priors)
-    result={"generated_at":datetime.now(timezone.utc).isoformat(),"config":{"sims":args.sims,"seed":args.seed,"model":args.model,"strategy":args.strategy,"probabilities":args.probabilities},"expected_score":score,"group_placements":bracket["group_placements"],"round_of_32":bracket["round_of_32"],"round_of_16":bracket["round_of_16"],"quarter_finals":bracket["quarter_finals"],"semi_finals":bracket["semi_finals"],"finalists":bracket["finalists"],"winner":bracket["winner"],"per_team_probs":per_team_probs(opt_probs),"validation":{"errors":errs,"mad_vs_uanalyse":mad}}
+    result={"generated_at":datetime.now(timezone.utc).isoformat(),"config":{"sims":args.sims,"seed":args.seed,"model":args.model,"strategy":args.strategy,"probabilities":args.probabilities},"expected_score":score,"group_placements":bracket["group_placements"],"round_of_32":bracket["round_of_32"],"round_of_16":bracket["round_of_16"],"quarter_finals":bracket["quarter_finals"],"semi_finals":bracket["semi_finals"],"finalists":bracket["finalists"],"winner":bracket["winner"],"per_team_probs":per_team_probs(opt_probs),"sim_result":sim,"validation":{"errors":errs,"mad_vs_uanalyse":mad}}
     print(f"\nWriting outputs...")
     if "json" in formats: render_json(result,f"{out_stem}.json"); print(f"  {out_stem}.json")
     if "csv" in formats: render_csv(bracket,opt_probs,f"{out_stem}.csv"); print(f"  {out_stem}.csv")

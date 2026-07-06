@@ -1,6 +1,6 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-06-11T21:41:17.686775+00:00
+**Last updated:** 2026-07-06T15:26:08.153856+00:00
 
 ## 🎯 Summary
 
@@ -10,237 +10,130 @@
 
 ## 📈 Scoring Summary
 
-**Current Score: 0 / 203 (0.0%)**
+**Current Score: 59 / 203 (29.1%)**
 
-**Accuracy: No matches played yet**
+**Accuracy: 59/87 correct (67.8%)**
 
 | Stage | Correct | Pts/Pick | Max | Pts Earned |
 |:---|:---:|:---:|:---:|:---:|
-| Group Placement | 0/0 | 1 | 48 | **0** |
-| Advance to Knockout | 0/0 (+32 pending) | 1 | 32 | **0** |
+| Group Placement | 34/48 | 1 | 48 | **34** |
+| Advance to Knockout | 25/32 | 1 | 32 | **25** |
 | Advance to R16 | 0/0 (+16 pending) | 2 | 32 | **0** |
 | Advance to QF | 0/0 (+8 pending) | 4 | 32 | **0** |
 | Advance to SF | 0/0 (+4 pending) | 6 | 24 | **0** |
 | Finalist | 0/0 (+2 pending) | 10 | 20 | **0** |
 | Winner | 0/0 (+5 pending) | 15 | 15 | **0** |
-| **Total** | | | **203** | **0** |
+| **Total** | | | **203** | **59** |
 
 ## 📊 Group Placements
 
-### Group A — 🔴 1/6 matches played
+### Group A — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇲🇽 Mexico | 🇲🇽 Mexico | 3 | +1 | 1 | 🔴 (projected) |
-| 2nd | 🇰🇷 South Korea | 🇰🇷 South Korea | 0 | 0 | 0 | 🔴 (projected) |
-| 3rd | 🇨🇿 Czech Republic | 🇨🇿 Czech Republic | 0 | 0 | 0 | 🔴 (projected) |
-| 4th | 🇿🇦 South Africa | 🇿🇦 South Africa | 0 | -1 | 1 | 🔴 (projected) |
+| 1st | 🇲🇽 Mexico | 🇲🇽 Mexico | 9 | +6 | 3 | ✅ |
+| 2nd | 🇰🇷 South Korea | 🇿🇦 South Africa | 4 | -1 | 3 | ❌ |
+| 3rd | 🇨🇿 Czech Republic | 🇰🇷 South Korea | 3 | -1 | 3 | ❌ |
+| 4th | 🇿🇦 South Africa | 🇨🇿 Czech Republic | 1 | -4 | 3 | ❌ |
 
-**Upcoming:**
-
-  - 2026-06-11 20:00 UTC-6: 🇰🇷 South Korea vs 🇨🇿 Czech Republic
-  - 2026-06-18 12:00 UTC-4: 🇨🇿 Czech Republic vs 🇿🇦 South Africa
-  - 2026-06-18 19:00 UTC-6: 🇲🇽 Mexico vs 🇰🇷 South Korea
-  - 2026-06-24 19:00 UTC-6: 🇨🇿 Czech Republic vs 🇲🇽 Mexico
-  - 2026-06-24 19:00 UTC-6: 🇿🇦 South Africa vs 🇰🇷 South Korea
-
-### Group B — ⏳ Not started
+### Group B — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇨🇭 Switzerland | 🇨🇦 Canada | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇨🇦 Canada | 🇨🇭 Switzerland | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇧🇦 Bosnia and Herzegovina | 🏳️ Bosnia & Herzegovina | 0 | 0 | 0 | ⏳ |
-| 4th | 🇶🇦 Qatar | 🇶🇦 Qatar | 0 | 0 | 0 | ⏳ |
+| 1st | 🇨🇭 Switzerland | 🇨🇭 Switzerland | 7 | +4 | 3 | ✅ |
+| 2nd | 🇨🇦 Canada | 🇨🇦 Canada | 4 | +5 | 3 | ✅ |
+| 3rd | 🇧🇦 Bosnia and Herzegovina | 🏳️ Bosnia & Herzegovina | 4 | -1 | 3 | ❌ |
+| 4th | 🇶🇦 Qatar | 🇶🇦 Qatar | 1 | -8 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-12 15:00 UTC-4: 🇨🇦 Canada vs 🏳️ Bosnia & Herzegovina
-  - 2026-06-13 12:00 UTC-7: 🇶🇦 Qatar vs 🇨🇭 Switzerland
-  - 2026-06-18 12:00 UTC-7: 🇨🇭 Switzerland vs 🏳️ Bosnia & Herzegovina
-  - 2026-06-18 15:00 UTC-7: 🇨🇦 Canada vs 🇶🇦 Qatar
-  - 2026-06-24 12:00 UTC-7: 🇨🇭 Switzerland vs 🇨🇦 Canada
-  - 2026-06-24 12:00 UTC-7: 🏳️ Bosnia & Herzegovina vs 🇶🇦 Qatar
-
-### Group C — ⏳ Not started
+### Group C — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇧🇷 Brazil | 🇭🇹 Haiti | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇲🇦 Morocco | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland | 0 | 0 | 0 | ⏳ |
-| 3rd | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland | 🇲🇦 Morocco | 0 | 0 | 0 | ⏳ |
-| 4th | 🇭🇹 Haiti | 🇧🇷 Brazil | 0 | 0 | 0 | ⏳ |
+| 1st | 🇧🇷 Brazil | 🇧🇷 Brazil | 7 | +6 | 3 | ✅ |
+| 2nd | 🇲🇦 Morocco | 🇲🇦 Morocco | 7 | +3 | 3 | ✅ |
+| 3rd | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland | 3 | -3 | 3 | ✅ |
+| 4th | 🇭🇹 Haiti | 🇭🇹 Haiti | 0 | -6 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-13 18:00 UTC-4: 🇧🇷 Brazil vs 🇲🇦 Morocco
-  - 2026-06-13 21:00 UTC-4: 🇭🇹 Haiti vs 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland
-  - 2026-06-19 18:00 UTC-4: 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇲🇦 Morocco
-  - 2026-06-19 20:30 UTC-4: 🇧🇷 Brazil vs 🇭🇹 Haiti
-  - 2026-06-24 18:00 UTC-4: 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇧🇷 Brazil
-  - 2026-06-24 18:00 UTC-4: 🇲🇦 Morocco vs 🇭🇹 Haiti
-
-### Group D — ⏳ Not started
+### Group D — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇹🇷 Turkey | 🇹🇷 Turkey | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇺🇸 USA | 🇵🇾 Paraguay | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇵🇾 Paraguay | 🇦🇺 Australia | 0 | 0 | 0 | ⏳ |
-| 4th | 🇦🇺 Australia | 🇺🇸 USA | 0 | 0 | 0 | ⏳ |
+| 1st | 🇹🇷 Turkey | 🇺🇸 USA | 6 | +4 | 3 | ❌ |
+| 2nd | 🇺🇸 USA | 🇦🇺 Australia | 4 | 0 | 3 | ❌ |
+| 3rd | 🇵🇾 Paraguay | 🇵🇾 Paraguay | 4 | -2 | 3 | ✅ |
+| 4th | 🇦🇺 Australia | 🇹🇷 Turkey | 3 | -2 | 3 | ❌ |
 
-**Upcoming:**
-
-  - 2026-06-12 18:00 UTC-7: 🇺🇸 USA vs 🇵🇾 Paraguay
-  - 2026-06-13 21:00 UTC-7: 🇦🇺 Australia vs 🇹🇷 Turkey
-  - 2026-06-19 12:00 UTC-7: 🇺🇸 USA vs 🇦🇺 Australia
-  - 2026-06-19 20:00 UTC-7: 🇹🇷 Turkey vs 🇵🇾 Paraguay
-  - 2026-06-25 19:00 UTC-7: 🇹🇷 Turkey vs 🇺🇸 USA
-  - 2026-06-25 19:00 UTC-7: 🇵🇾 Paraguay vs 🇦🇺 Australia
-
-### Group E — ⏳ Not started
+### Group E — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇩🇪 Germany | 🇨🇮 Ivory Coast | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇪🇨 Ecuador | 🇪🇨 Ecuador | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇨🇮 Ivory Coast | 🇩🇪 Germany | 0 | 0 | 0 | ⏳ |
-| 4th | 🇨🇼 Curaçao | 🇨🇼 Curaçao | 0 | 0 | 0 | ⏳ |
+| 1st | 🇩🇪 Germany | 🇩🇪 Germany | 6 | +6 | 3 | ✅ |
+| 2nd | 🇪🇨 Ecuador | 🇨🇮 Ivory Coast | 6 | +2 | 3 | ❌ |
+| 3rd | 🇨🇮 Ivory Coast | 🇪🇨 Ecuador | 4 | 0 | 3 | ❌ |
+| 4th | 🇨🇼 Curaçao | 🇨🇼 Curaçao | 1 | -8 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-14 12:00 UTC-5: 🇩🇪 Germany vs 🇨🇼 Curaçao
-  - 2026-06-14 19:00 UTC-4: 🇨🇮 Ivory Coast vs 🇪🇨 Ecuador
-  - 2026-06-20 16:00 UTC-4: 🇩🇪 Germany vs 🇨🇮 Ivory Coast
-  - 2026-06-20 19:00 UTC-5: 🇪🇨 Ecuador vs 🇨🇼 Curaçao
-  - 2026-06-25 16:00 UTC-4: 🇨🇼 Curaçao vs 🇨🇮 Ivory Coast
-  - 2026-06-25 16:00 UTC-4: 🇪🇨 Ecuador vs 🇩🇪 Germany
-
-### Group F — ⏳ Not started
+### Group F — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇳🇱 Netherlands | 🇸🇪 Sweden | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇯🇵 Japan | 🇯🇵 Japan | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇸🇪 Sweden | 🇳🇱 Netherlands | 0 | 0 | 0 | ⏳ |
-| 4th | 🇹🇳 Tunisia | 🇹🇳 Tunisia | 0 | 0 | 0 | ⏳ |
+| 1st | 🇳🇱 Netherlands | 🇳🇱 Netherlands | 7 | +6 | 3 | ✅ |
+| 2nd | 🇯🇵 Japan | 🇯🇵 Japan | 5 | +4 | 3 | ✅ |
+| 3rd | 🇸🇪 Sweden | 🇸🇪 Sweden | 4 | 0 | 3 | ✅ |
+| 4th | 🇹🇳 Tunisia | 🇹🇳 Tunisia | 0 | -10 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-14 15:00 UTC-5: 🇳🇱 Netherlands vs 🇯🇵 Japan
-  - 2026-06-14 20:00 UTC-6: 🇸🇪 Sweden vs 🇹🇳 Tunisia
-  - 2026-06-20 12:00 UTC-5: 🇳🇱 Netherlands vs 🇸🇪 Sweden
-  - 2026-06-20 22:00 UTC-6: 🇹🇳 Tunisia vs 🇯🇵 Japan
-  - 2026-06-25 18:00 UTC-5: 🇯🇵 Japan vs 🇸🇪 Sweden
-  - 2026-06-25 18:00 UTC-5: 🇹🇳 Tunisia vs 🇳🇱 Netherlands
-
-### Group G — ⏳ Not started
+### Group G — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇧🇪 Belgium | 🇧🇪 Belgium | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇪🇬 Egypt | 🇳🇿 New Zealand | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇮🇷 Iran | 🇮🇷 Iran | 0 | 0 | 0 | ⏳ |
-| 4th | 🇳🇿 New Zealand | 🇪🇬 Egypt | 0 | 0 | 0 | ⏳ |
+| 1st | 🇧🇪 Belgium | 🇧🇪 Belgium | 5 | +4 | 3 | ✅ |
+| 2nd | 🇪🇬 Egypt | 🇪🇬 Egypt | 5 | +2 | 3 | ✅ |
+| 3rd | 🇮🇷 Iran | 🇮🇷 Iran | 3 | 0 | 3 | ✅ |
+| 4th | 🇳🇿 New Zealand | 🇳🇿 New Zealand | 1 | -6 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-15 12:00 UTC-7: 🇧🇪 Belgium vs 🇪🇬 Egypt
-  - 2026-06-15 18:00 UTC-7: 🇮🇷 Iran vs 🇳🇿 New Zealand
-  - 2026-06-21 12:00 UTC-7: 🇧🇪 Belgium vs 🇮🇷 Iran
-  - 2026-06-21 18:00 UTC-7: 🇳🇿 New Zealand vs 🇪🇬 Egypt
-  - 2026-06-26 20:00 UTC-7: 🇪🇬 Egypt vs 🇮🇷 Iran
-  - 2026-06-26 20:00 UTC-7: 🇳🇿 New Zealand vs 🇧🇪 Belgium
-
-### Group H — ⏳ Not started
+### Group H — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇪🇸 Spain | 🇪🇸 Spain | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇺🇾 Uruguay | 🇸🇦 Saudi Arabia | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇸🇦 Saudi Arabia | 🇺🇾 Uruguay | 0 | 0 | 0 | ⏳ |
-| 4th | 🇨🇻 Cape Verde | 🇨🇻 Cape Verde | 0 | 0 | 0 | ⏳ |
+| 1st | 🇪🇸 Spain | 🇪🇸 Spain | 7 | +5 | 3 | ✅ |
+| 2nd | 🇺🇾 Uruguay | 🇨🇻 Cape Verde | 3 | 0 | 3 | ❌ |
+| 3rd | 🇸🇦 Saudi Arabia | 🇺🇾 Uruguay | 2 | -1 | 3 | ❌ |
+| 4th | 🇨🇻 Cape Verde | 🇸🇦 Saudi Arabia | 2 | -4 | 3 | ❌ |
 
-**Upcoming:**
-
-  - 2026-06-15 12:00 UTC-4: 🇪🇸 Spain vs 🇨🇻 Cape Verde
-  - 2026-06-15 18:00 UTC-4: 🇸🇦 Saudi Arabia vs 🇺🇾 Uruguay
-  - 2026-06-21 12:00 UTC-4: 🇪🇸 Spain vs 🇸🇦 Saudi Arabia
-  - 2026-06-21 18:00 UTC-4: 🇺🇾 Uruguay vs 🇨🇻 Cape Verde
-  - 2026-06-26 19:00 UTC-5: 🇨🇻 Cape Verde vs 🇸🇦 Saudi Arabia
-  - 2026-06-26 18:00 UTC-6: 🇺🇾 Uruguay vs 🇪🇸 Spain
-
-### Group I — ⏳ Not started
+### Group I — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇫🇷 France | 🇮🇶 Iraq | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇳🇴 Norway | 🇸🇳 Senegal | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇸🇳 Senegal | 🇳🇴 Norway | 0 | 0 | 0 | ⏳ |
-| 4th | 🇮🇶 Iraq | 🇫🇷 France | 0 | 0 | 0 | ⏳ |
+| 1st | 🇫🇷 France | 🇫🇷 France | 9 | +8 | 3 | ✅ |
+| 2nd | 🇳🇴 Norway | 🇳🇴 Norway | 6 | +1 | 3 | ✅ |
+| 3rd | 🇸🇳 Senegal | 🇸🇳 Senegal | 3 | +2 | 3 | ✅ |
+| 4th | 🇮🇶 Iraq | 🇮🇶 Iraq | 0 | -11 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-16 15:00 UTC-4: 🇫🇷 France vs 🇸🇳 Senegal
-  - 2026-06-16 18:00 UTC-4: 🇮🇶 Iraq vs 🇳🇴 Norway
-  - 2026-06-22 17:00 UTC-4: 🇫🇷 France vs 🇮🇶 Iraq
-  - 2026-06-22 20:00 UTC-4: 🇳🇴 Norway vs 🇸🇳 Senegal
-  - 2026-06-26 15:00 UTC-4: 🇳🇴 Norway vs 🇫🇷 France
-  - 2026-06-26 15:00 UTC-4: 🇸🇳 Senegal vs 🇮🇶 Iraq
-
-### Group J — ⏳ Not started
+### Group J — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇦🇷 Argentina | 🇩🇿 Algeria | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇦🇹 Austria | 🇯🇴 Jordan | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇩🇿 Algeria | 🇦🇷 Argentina | 0 | 0 | 0 | ⏳ |
-| 4th | 🇯🇴 Jordan | 🇦🇹 Austria | 0 | 0 | 0 | ⏳ |
+| 1st | 🇦🇷 Argentina | 🇦🇷 Argentina | 9 | +7 | 3 | ✅ |
+| 2nd | 🇦🇹 Austria | 🇦🇹 Austria | 4 | 0 | 3 | ✅ |
+| 3rd | 🇩🇿 Algeria | 🇩🇿 Algeria | 4 | -2 | 3 | ✅ |
+| 4th | 🇯🇴 Jordan | 🇯🇴 Jordan | 0 | -5 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-16 20:00 UTC-5: 🇦🇷 Argentina vs 🇩🇿 Algeria
-  - 2026-06-16 21:00 UTC-7: 🇦🇹 Austria vs 🇯🇴 Jordan
-  - 2026-06-22 12:00 UTC-5: 🇦🇷 Argentina vs 🇦🇹 Austria
-  - 2026-06-22 20:00 UTC-7: 🇯🇴 Jordan vs 🇩🇿 Algeria
-  - 2026-06-27 21:00 UTC-5: 🇩🇿 Algeria vs 🇦🇹 Austria
-  - 2026-06-27 21:00 UTC-5: 🇯🇴 Jordan vs 🇦🇷 Argentina
-
-### Group K — ⏳ Not started
+### Group K — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🇵🇹 Portugal | 🇺🇿 Uzbekistan | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇨🇴 Colombia | 🇵🇹 Portugal | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇨🇩 DR Congo | 🇨🇩 DR Congo | 0 | 0 | 0 | ⏳ |
-| 4th | 🇺🇿 Uzbekistan | 🇨🇴 Colombia | 0 | 0 | 0 | ⏳ |
+| 1st | 🇵🇹 Portugal | 🇨🇴 Colombia | 7 | +3 | 3 | ❌ |
+| 2nd | 🇨🇴 Colombia | 🇵🇹 Portugal | 5 | +5 | 3 | ❌ |
+| 3rd | 🇨🇩 DR Congo | 🇨🇩 DR Congo | 4 | +1 | 3 | ✅ |
+| 4th | 🇺🇿 Uzbekistan | 🇺🇿 Uzbekistan | 0 | -9 | 3 | ✅ |
 
-**Upcoming:**
-
-  - 2026-06-17 12:00 UTC-5: 🇵🇹 Portugal vs 🇨🇩 DR Congo
-  - 2026-06-17 20:00 UTC-6: 🇺🇿 Uzbekistan vs 🇨🇴 Colombia
-  - 2026-06-23 12:00 UTC-5: 🇵🇹 Portugal vs 🇺🇿 Uzbekistan
-  - 2026-06-23 20:00 UTC-6: 🇨🇴 Colombia vs 🇨🇩 DR Congo
-  - 2026-06-27 19:30 UTC-4: 🇨🇴 Colombia vs 🇵🇹 Portugal
-  - 2026-06-27 19:30 UTC-4: 🇨🇩 DR Congo vs 🇺🇿 Uzbekistan
-
-### Group L — ⏳ Not started
+### Group L — ✅ Final
 
 | Pos | Predicted | Actual | Pts | GD | Pld | Result |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
-| 1st | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England | 🇬🇭 Ghana | 0 | 0 | 0 | ⏳ |
-| 2nd | 🇭🇷 Croatia | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England | 0 | 0 | 0 | ⏳ |
-| 3rd | 🇬🇭 Ghana | 🇭🇷 Croatia | 0 | 0 | 0 | ⏳ |
-| 4th | 🇵🇦 Panama | 🇵🇦 Panama | 0 | 0 | 0 | ⏳ |
-
-**Upcoming:**
-
-  - 2026-06-17 15:00 UTC-5: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇭🇷 Croatia
-  - 2026-06-17 19:00 UTC-4: 🇬🇭 Ghana vs 🇵🇦 Panama
-  - 2026-06-23 16:00 UTC-4: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇬🇭 Ghana
-  - 2026-06-23 19:00 UTC-4: 🇵🇦 Panama vs 🇭🇷 Croatia
-  - 2026-06-27 17:00 UTC-4: 🇵🇦 Panama vs 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
-  - 2026-06-27 17:00 UTC-4: 🇭🇷 Croatia vs 🇬🇭 Ghana
+| 1st | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England | 7 | +4 | 3 | ✅ |
+| 2nd | 🇭🇷 Croatia | 🇭🇷 Croatia | 6 | 0 | 3 | ✅ |
+| 3rd | 🇬🇭 Ghana | 🇬🇭 Ghana | 4 | 0 | 3 | ✅ |
+| 4th | 🇵🇦 Panama | 🇵🇦 Panama | 0 | -4 | 3 | ✅ |
 
 ## 🏆 Knockout Bracket
 

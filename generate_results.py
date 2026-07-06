@@ -30,10 +30,12 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from generate_bracket import nteam
+
 # ── Country flag emojis ────────────────────────────────────────────────
 FLAGS = {
     "Algeria": "🇩🇿", "Argentina": "🇦🇷", "Australia": "🇦🇺", "Austria": "🇦🇹",
-    "Belgium": "🇧🇪", "Bosnia and Herzegovina": "🇧🇦", "Brazil": "🇧🇷",
+    "Belgium": "🇧🇪", "Bosnia and Herzegovina": "🇧🇦", "Bosnia & Herzegovina": "🇧🇦", "Brazil": "🇧🇷",
     "Canada": "🇨🇦", "Cape Verde": "🇨🇻", "Colombia": "🇨🇴", "Croatia": "🇭🇷",
     "Curaçao": "🇨🇼", "Czech Republic": "🇨🇿", "DR Congo": "🇨🇩",
     "Ecuador": "🇪🇨", "Egypt": "🇪🇬", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "France": "🇫🇷",
@@ -58,6 +60,15 @@ STAGE_KEY = {
     "finalists": "final", "winner": "champion",
 }
 
+# Prior-round winners determine whether a knockout advancement stage is resolved.
+KNOCKOUT_ADVANCEMENT = [
+    ("round_of_16", "round_of_16", range(73, 89), 16),
+    ("quarter_finals", "quarter_finals", range(89, 97), 8),
+    ("semi_finals", "semi_finals", range(97, 101), 4),
+    ("finalists", "finalists", range(101, 103), 2),
+    ("winner", "winner", range(104, 105), 1),
+]
+
 EMOJI_CHECK = "✅"
 EMOJI_WRONG = "❌"
 EMOJI_TIE = "🟰"
@@ -66,7 +77,13 @@ EMOJI_LIVE = "🔴"
 
 
 def flag(name):
-    return FLAGS.get(name, "🏳️")
+    if not name or name == "—":
+        return "🏳️"
+    return FLAGS.get(name, FLAGS.get(nteam(name), "🏳️"))
+
+
+def same_team(left, right):
+    return nteam(left) == nteam(right)
 
 
 def pct(p):
@@ -87,16 +104,66 @@ def load_results(results_path):
 def parse_fixture_results(results):
     matches = results.get("matches", {})
     parsed = {}
-    for key, m in matches.items():
+    for key, match in matches.items():
         norm_key = key.replace(" ", "_")
         parsed[norm_key] = {
-            "team1": m.get("team1", "").replace(" ", "_"),
-            "team2": m.get("team2", "").replace(" ", "_"),
-            "score1": m.get("score1"), "score2": m.get("score2"),
-            "winner": m.get("winner"),
-            "played": m.get("winner") is not None,
+            "team1": match.get("team1", "").replace(" ", "_"),
+            "team2": match.get("team2", "").replace(" ", "_"),
+            "score1": match.get("score1"), "score2": match.get("score2"),
+            "winner": match.get("winner"),
+            "played": match.get("winner") is not None,
         }
     return parsed
+
+
+def parse_knockout_results(results):
+    knockout = results.get("knockout_matches", {})
+    parsed = {}
+    for key, match in knockout.items():
+        winner = match.get("winner")
+        played = bool(match.get("played")) and winner not in (None, "draw")
+        parsed[key] = {
+            "team1": match.get("team1", ""),
+            "team2": match.get("team2", ""),
+            "score1": match.get("score1"),
+            "score2": match.get("score2"),
+            "winner": winner,
+            "match_num": match.get("match_num"),
+            "round": match.get("round"),
+            "played": played,
+        }
+    return parsed
+
+
+def knockout_round_winners(ko_parsed, match_num_range):
+    winners = set()
+    for match in ko_parsed.values():
+        match_num = match.get("match_num")
+        if match_num not in match_num_range or not match.get("played"):
+            continue
+        winners.add(nteam(match["winner"]))
+    return winners
+
+
+def is_knockout_round_complete(ko_parsed, match_num_range, expected_matches):
+    decided = [
+        match for match in ko_parsed.values()
+        if match.get("match_num") in match_num_range and match.get("played")
+    ]
+    return len(decided) >= expected_matches
+
+
+def score_advancement_picks(scores, score_key, predicted, actual, points_per, total_played, total_correct):
+    predicted_norm = {nteam(team) for team in predicted}
+    actual_norm = {nteam(team) for team in actual}
+    for team in sorted(predicted_norm):
+        if team in actual_norm:
+            scores[score_key]["correct"] += 1
+            scores[score_key]["points"] += points_per
+            total_correct += 1
+        total_played += 1
+    scores[score_key]["total"] = len(predicted_norm)
+    return total_played, total_correct
 
 
 def compute_group_standings(fixtures, results_parsed, group_letter):
@@ -163,7 +230,7 @@ def count_played_matches(group_matches, results_parsed):
     return count
 
 
-def compute_scores(bracket, fixtures, results_parsed):
+def compute_scores(bracket, fixtures, results_parsed, ko_parsed):
     scores = {
         "group_placement": {"correct": 0, "total": 0, "points": 0, "max": 48},
         "round_of_32": {"correct": 0, "total": 0, "points": 0, "max": 32},
@@ -177,24 +244,25 @@ def compute_scores(bracket, fixtures, results_parsed):
     total_correct = 0
 
     # ── Group placements (only when all 6 matches played) ──
+    group_total = 0
     for g in sorted(bracket["group_placements"].keys()):
         predicted = bracket["group_placements"][g]
         fixture_group = f"Group {g}" if not g.startswith("Group ") else g
         group_matches = [m for m in fixtures if m.get("group") == fixture_group]
         if not is_group_complete(group_matches, results_parsed):
             continue
-        ranked, standings, _ = compute_group_standings(fixtures, results_parsed, fixture_group)
+        ranked, _, _ = compute_group_standings(fixtures, results_parsed, fixture_group)
         for pos in range(4):
             pred_team = predicted[pos] if pos < len(predicted) else None
             actual_team = ranked[pos] if pos < len(ranked) else None
             if pred_team and actual_team:
-                is_correct = pred_team == actual_team
-                if is_correct:
+                if same_team(pred_team, actual_team):
                     scores["group_placement"]["correct"] += 1
                     scores["group_placement"]["points"] += 1
                     total_correct += 1
+                group_total += 1
                 total_played += 1
-        scores["group_placement"]["total"] = total_played
+    scores["group_placement"]["total"] = group_total
 
     # ── R32 qualifiers (only when all groups complete) ──
     groups_list = sorted(set(m["group"] for m in fixtures if m.get("group")))
@@ -206,46 +274,46 @@ def compute_scores(bracket, fixtures, results_parsed):
         for g in groups_list
     )
     if all_groups_complete:
-        predicted_r32 = set(bracket.get("round_of_32", []))
+        predicted_r32 = {nteam(team) for team in bracket.get("round_of_32", [])}
         actual_r32 = set()
         all_thirds = []
         for g in groups_list:
             ranked, standings, _ = compute_group_standings(fixtures, results_parsed, g)
             if len(ranked) >= 2:
-                actual_r32.add(ranked[0])
-                actual_r32.add(ranked[1])
+                actual_r32.add(nteam(ranked[0]))
+                actual_r32.add(nteam(ranked[1]))
             if len(ranked) >= 3:
                 all_thirds.append((ranked[2], standings[ranked[2]]["pts"],
                                   standings[ranked[2]]["gd"], standings[ranked[2]]["gf"]))
         all_thirds.sort(key=lambda x: (-x[1], -x[2], -x[3]))
-        for t, _, _, _ in all_thirds[:8]:
-            actual_r32.add(t)
+        for team, _, _, _ in all_thirds[:8]:
+            actual_r32.add(nteam(team))
         for team in sorted(predicted_r32):
             if team in actual_r32:
                 scores["round_of_32"]["correct"] += 1
                 scores["round_of_32"]["points"] += 1
                 total_correct += 1
             total_played += 1
-        for team in sorted(actual_r32):
-            if team not in predicted_r32:
-                total_played += 1
-        scores["round_of_32"]["total"] = max(len(predicted_r32), len(actual_r32))
+        scores["round_of_32"]["total"] = len(predicted_r32)
     else:
         scores["round_of_32"]["pending"] = len(bracket.get("round_of_32", []))
 
-    # ── Knockout stages ──
-    ko_rounds = [
-        ("round_of_16", "round_of_16", "Round of 16"),
-        ("quarter_finals", "quarter_finals", "Quarter-final"),
-        ("semi_finals", "semi_finals", "Semi-final"),
-        ("finalists", "final", "Final"),
-        ("winner", "champion", "Winner"),
-    ]
-    for score_key, _, _ in ko_rounds:
-        predicted = bracket.get(score_key, [])
+    # ── Knockout advancement stages ──
+    for score_key, bracket_key, match_num_range, expected_matches in KNOCKOUT_ADVANCEMENT:
+        if score_key == "winner":
+            predicted = [bracket.get("winner", "")] if bracket.get("winner") else []
+        else:
+            predicted = bracket.get(bracket_key, [])
         if not predicted:
             continue
-        scores[score_key]["pending"] = len(predicted)
+        if not is_knockout_round_complete(ko_parsed, match_num_range, expected_matches):
+            scores[score_key]["pending"] = len(predicted)
+            continue
+        actual = knockout_round_winners(ko_parsed, match_num_range)
+        total_played, total_correct = score_advancement_picks(
+            scores, score_key, predicted, actual, STAGE_POINTS[score_key],
+            total_played, total_correct,
+        )
 
     total_points = sum(s["points"] for s in scores.values())
     return scores, total_points, total_played, total_correct
@@ -348,13 +416,12 @@ def render_group_placements(bracket, per_team_probs, fixtures, results_parsed):
 
             # Result marker
             if complete and pred_team != "—" and actual_team != "—":
-                if pred_team == actual_team:
+                if same_team(pred_team, actual_team):
                     result = EMOJI_CHECK
                 else:
                     result = EMOJI_WRONG
             elif played > 0 and pred_team != "—" and actual_team != "—":
-                # Partial group — show if current position matches prediction
-                if pred_team == actual_team:
+                if same_team(pred_team, actual_team):
                     result = f"{EMOJI_LIVE} (projected)"
                 else:
                     result = f"{EMOJI_LIVE} (projected)"
@@ -511,8 +578,11 @@ def generate_results(bracket_path, fixtures_path, results_path, output_path):
     per_team_probs = bracket.get("per_team_probs", {})
     actual_results = load_results(results_path)
     results_parsed = parse_fixture_results(actual_results)
+    ko_parsed = parse_knockout_results(actual_results)
 
-    actual_scores, actual_points, total_played, total_correct = compute_scores(bracket, fixtures, results_parsed)
+    actual_scores, actual_points, total_played, total_correct = compute_scores(
+        bracket, fixtures, results_parsed, ko_parsed,
+    )
     expected_score = compute_expected_score_from_probs(bracket, per_team_probs)
 
     L = []

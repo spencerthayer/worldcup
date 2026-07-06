@@ -1,6 +1,6 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-07-06T15:26:08.153856+00:00
+**Last updated:** 2026-07-06T18:20:18.265389+00:00
 
 ## 🎯 Summary
 
@@ -10,20 +10,20 @@
 
 ## 📈 Scoring Summary
 
-**Current Score: 59 / 203 (29.1%)**
+**Current Score: 61 / 203 (30.0%)**
 
-**Accuracy: 59/87 correct (67.8%)**
+**Accuracy: 61/80 correct (76.2%)**
 
 | Stage | Correct | Pts/Pick | Max | Pts Earned |
 |:---|:---:|:---:|:---:|:---:|
-| Group Placement | 34/48 | 1 | 48 | **34** |
-| Advance to Knockout | 25/32 | 1 | 32 | **25** |
+| Group Placement | 35/48 | 1 | 48 | **35** |
+| Advance to Knockout | 26/32 | 1 | 32 | **26** |
 | Advance to R16 | 0/0 (+16 pending) | 2 | 32 | **0** |
 | Advance to QF | 0/0 (+8 pending) | 4 | 32 | **0** |
 | Advance to SF | 0/0 (+4 pending) | 6 | 24 | **0** |
 | Finalist | 0/0 (+2 pending) | 10 | 20 | **0** |
-| Winner | 0/0 (+5 pending) | 15 | 15 | **0** |
-| **Total** | | | **203** | **59** |
+| Winner | 0/0 (+1 pending) | 15 | 15 | **0** |
+| **Total** | | | **203** | **61** |
 
 ## 📊 Group Placements
 
@@ -42,7 +42,7 @@
 |:---:|:---|:---|:---:|:---:|:---:|:---:|
 | 1st | 🇨🇭 Switzerland | 🇨🇭 Switzerland | 7 | +4 | 3 | ✅ |
 | 2nd | 🇨🇦 Canada | 🇨🇦 Canada | 4 | +5 | 3 | ✅ |
-| 3rd | 🇧🇦 Bosnia and Herzegovina | 🏳️ Bosnia & Herzegovina | 4 | -1 | 3 | ❌ |
+| 3rd | 🇧🇦 Bosnia and Herzegovina | 🇧🇦 Bosnia & Herzegovina | 4 | -1 | 3 | ✅ |
 | 4th | 🇶🇦 Qatar | 🇶🇦 Qatar | 1 | -8 | 3 | ✅ |
 
 ### Group C — ✅ Final

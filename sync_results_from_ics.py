@@ -77,7 +77,7 @@ def knockout_round_for_match_num(match_num):
     return None
 
 
-def extract_penalty_winner(event_text, canon_to_fixture):
+def extract_penalty_winner_from_description(event_text, canon_to_fixture):
     desc = event_text.replace("\\n", "\n").replace("\\r", "")
     pens = re.findall(r"Penalty scored - [^(]+\(([^)]+)\)", desc)
     if not pens:
@@ -94,6 +94,45 @@ def extract_penalty_winner(event_text, canon_to_fixture):
     if fs2 > fs1:
         return wt2
     return None
+
+
+def resolve_knockout_winner(summary, t1, t2, s1, s2, event_text, canon_to_fixture):
+    """
+    Resolve knockout winner from regulation score, then ET, then penalties.
+
+    ICS summaries encode extras as:
+      (ET 1 - 0)                    — extra-time goals for team1 / team2
+      (ET 0 - 0, Penalties 4 - 3)  — pens for team1 / team2
+    """
+    if s1 > s2:
+        return t1, False, False
+    if s2 > s1:
+        return t2, False, False
+
+    # Normalize escaped commas from ICS unfolding
+    summary_norm = summary.replace("\\,", ",")
+
+    et = re.search(r"\(ET\s+(\d+)\s*-\s*(\d+)", summary_norm)
+    if et:
+        et1, et2 = int(et.group(1)), int(et.group(2))
+        if et1 > et2:
+            return t1, True, False
+        if et2 > et1:
+            return t2, True, False
+
+    pens = re.search(r"Penalties\s+(\d+)\s*-\s*(\d+)", summary_norm)
+    if pens:
+        p1, p2 = int(pens.group(1)), int(pens.group(2))
+        if p1 > p2:
+            return t1, True, True
+        if p2 > p1:
+            return t2, True, True
+
+    pen_winner = extract_penalty_winner_from_description(event_text, canon_to_fixture)
+    if pen_winner:
+        return pen_winner, True, True
+
+    return "draw", False, False
 
 
 def sync_results(ics_url=ICS_URL, results_path=RESULTS_PATH, ics_out=ICS_OUT):
@@ -128,16 +167,18 @@ def sync_results(ics_url=ICS_URL, results_path=RESULTS_PATH, ics_out=ICS_OUT):
         match_num = parse_match_num(summary)
         ko_round = knockout_round_for_match_num(match_num)
 
-        if s1 > s2:
+        went_et = False
+        went_pens = False
+        if ko_round:
+            winner, went_et, went_pens = resolve_knockout_winner(
+                summary, t1, t2, s1, s2, event, canon_to_fixture,
+            )
+        elif s1 > s2:
             winner = t1
         elif s2 > s1:
             winner = t2
         else:
             winner = "draw"
-            if ko_round:
-                pen_winner = extract_penalty_winner(event, canon_to_fixture)
-                if pen_winner:
-                    winner = pen_winner
 
         entry = {
             "team1": t1,
@@ -160,8 +201,10 @@ def sync_results(ics_url=ICS_URL, results_path=RESULTS_PATH, ics_out=ICS_OUT):
             entry["group"] = fixture_match["group"].replace("Group ", "")
             matches[key] = entry
         elif ko_round:
-            if winner != "draw":
-                entry["penalties"] = s1 == s2
+            if went_et or went_pens or (s1 == s2 and winner != "draw"):
+                entry["extra_time"] = True
+            if went_pens or (winner != "draw" and "Penalties" in summary.replace("\\,", ",")):
+                entry["penalties"] = True
             entry["match_num"] = match_num
             entry["round"] = ko_round
             key = entry["team1"].replace(" ", "_") + "_vs_" + entry["team2"].replace(" ", "_")

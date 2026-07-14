@@ -941,8 +941,18 @@
       "extra_time": true,
       "match_num": 100,
       "round": "quarter_finals"
+    },
+    "France_vs_Spain": {
+      "team1": "France",
+      "team2": "Spain",
+      "score1": 0,
+      "score2": 2,
+      "winner": "Spain",
+      "played": true,
+      "match_num": 101,
+      "round": "semi_finals"
     }
   },
-  "last_updated": "2026-07-14T19:32:05.432980+00:00",
+  "last_updated": "2026-07-14T22:42:00.771257+00:00",
   "source": "kubeia ICS calendar"
 }

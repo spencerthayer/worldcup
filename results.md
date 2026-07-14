@@ -1,6 +1,6 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-07-14T20:14:47.130392+00:00
+**Last updated:** 2026-07-14T22:42:00.823758+00:00
 
 ## 🎯 Summary
 
@@ -187,7 +187,7 @@ flowchart TB
     direction LR
     subgraph sfPath101["SF 101 · W97 vs W98"]
       direction TB
-      m101["SF: 🇫🇷 France vs 🇪🇸 Spain"]:::pending
+      m101["SF: 🇫🇷 France 0-2 🇪🇸 Spain → 🇪🇸 Spain"]:::hit
     end
     subgraph sfPath102["SF 102 · W99 vs W100"]
       direction TB
@@ -198,7 +198,7 @@ flowchart TB
 
   subgraph sgFinalists["6. Finalists"]
     direction LR
-    m104["F: 🏳️ W101 vs 🏳️ W102"]:::pending
+    m104["F: 🇪🇸 Spain vs 🏳️ W102"]:::pending
   end
 
   subgraph sgWinner["7. Winner"]

@@ -1,6 +1,6 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-07-14T19:32:05.470390+00:00
+**Last updated:** 2026-07-14T20:14:47.130392+00:00
 
 ## 🎯 Summary
 
@@ -24,6 +24,205 @@
 | Finalist | 0/0 (+2 pending) | 10 | 20 | **0** |
 | Winner | 0/0 (+1 pending) | 15 | 15 | **0** |
 | **Total** | | | **203** | **123** |
+
+## 🗺️ Bracket Progress vs Prediction
+
+One chart with stage rows read **top → bottom**. Within each row, the requested groups run **left → right**.
+
+- 🟢 **Green** — predicted correctly for this stage
+- 🟡 **Yellow** — partial group placement hit
+- 🔴 **Red** — miss / upset vs prediction
+- ⚪ **Gray** — not resolved yet
+- `*` on a score — decided in extra time or penalties
+
+**Predicted deep run:** Champion: Spain · Final: Argentina vs Spain · SF: Argentina, Brazil, France, Spain
+
+```mermaid
+%%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 48, "rankSpacing": 48}, "themeVariables": {"fontSize": "14px"}}}%%
+flowchart TB
+  classDef hit fill:#d1fae5,stroke:#059669,color:#064e3b,stroke-width:2px
+  classDef miss fill:#fee2e2,stroke:#dc2626,color:#7f1d1d,stroke-width:2px
+  classDef partial fill:#fef9c3,stroke:#ca8a04,color:#713f12,stroke-width:2px
+  classDef pending fill:#f3f4f6,stroke:#9ca3af,color:#374151,stroke-width:1px
+  classDef champ fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:3px
+
+  subgraph sgPlacement["1. Placement"]
+    direction LR
+    subgraph placeAD["Groups A–D"]
+      direction TB
+      grpA["A: 1/4 🇲🇽 Mexico+ 🇰🇷 S. Korea× 🇨🇿 Czechia× 🇿🇦 S. Africa×"]:::partial
+      grpB["B: 4/4 🇨🇭 Swiss+ 🇨🇦 Canada+ 🇧🇦 Bosnia+ 🇶🇦 Qatar+"]:::hit
+      grpC["C: 4/4 🇧🇷 Brazil+ 🇲🇦 Morocco+ 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland+ 🇭🇹 Haiti+"]:::hit
+      grpD["D: 1/4 🇹🇷 Turkey× 🇺🇸 USA× 🇵🇾 Paraguay+ 🇦🇺 Australia×"]:::partial
+      grpA --> grpB
+      grpB --> grpC
+      grpC --> grpD
+    end
+    subgraph placeEH["Groups E–H"]
+      direction TB
+      grpE["E: 2/4 🇩🇪 Germany+ 🇪🇨 Ecuador× 🇨🇮 C. d'Ivoire× 🇨🇼 Curaçao+"]:::partial
+      grpF["F: 4/4 🇳🇱 Neth.+ 🇯🇵 Japan+ 🇸🇪 Sweden+ 🇹🇳 Tunisia+"]:::hit
+      grpG["G: 4/4 🇧🇪 Belgium+ 🇪🇬 Egypt+ 🇮🇷 Iran+ 🇳🇿 N. Zealand+"]:::hit
+      grpH["H: 1/4 🇪🇸 Spain+ 🇺🇾 Uruguay× 🇸🇦 Saudi× 🇨🇻 C. Verde×"]:::partial
+      grpE --> grpF
+      grpF --> grpG
+      grpG --> grpH
+    end
+    subgraph placeIL["Groups I–L"]
+      direction TB
+      grpI["I: 4/4 🇫🇷 France+ 🇳🇴 Norway+ 🇸🇳 Senegal+ 🇮🇶 Iraq+"]:::hit
+      grpJ["J: 4/4 🇦🇷 Argentina+ 🇦🇹 Austria+ 🇩🇿 Algeria+ 🇯🇴 Jordan+"]:::hit
+      grpK["K: 2/4 🇵🇹 Portugal× 🇨🇴 Colombia× 🇨🇩 DR Congo+ 🇺🇿 Uzbekistan+"]:::partial
+      grpL["L: 4/4 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England+ 🇭🇷 Croatia+ 🇬🇭 Ghana+ 🇵🇦 Panama+"]:::hit
+      grpI --> grpJ
+      grpJ --> grpK
+      grpK --> grpL
+    end
+    placeAD --> placeEH
+    placeEH --> placeIL
+  end
+
+  subgraph sgKnockout["2. Knockout"]
+    direction LR
+    subgraph koPath97["QF 97"]
+      direction TB
+      m73["R32: 🇿🇦 S. Africa 0-1 🇨🇦 Canada → 🇨🇦 Canada"]:::hit
+      m75["R32: 🇳🇱 Neth. 1-1* 🇲🇦 Morocco → 🇲🇦 Morocco"]:::miss
+      m74["R32: 🇩🇪 Germany 1-1* 🇵🇾 Paraguay → 🇵🇾 Paraguay"]:::miss
+      m77["R32: 🇫🇷 France 3-0 🇸🇪 Sweden → 🇫🇷 France"]:::hit
+      m73 --> m75
+      m75 --> m74
+      m74 --> m77
+    end
+    subgraph koPath98["QF 98"]
+      direction TB
+      m81["R32: 🇺🇸 USA 2-0 🇧🇦 Bosnia → 🇺🇸 USA"]:::hit
+      m82["R32: 🇧🇪 Belgium 2-2* 🇸🇳 Senegal → 🇧🇪 Belgium"]:::hit
+      m83["R32: 🇵🇹 Portugal 2-1 🇭🇷 Croatia → 🇵🇹 Portugal"]:::hit
+      m84["R32: 🇪🇸 Spain 3-0 🇦🇹 Austria → 🇪🇸 Spain"]:::hit
+      m81 --> m82
+      m82 --> m83
+      m83 --> m84
+    end
+    subgraph koPath99["QF 99"]
+      direction TB
+      m76["R32: 🇧🇷 Brazil 2-1 🇯🇵 Japan → 🇧🇷 Brazil"]:::hit
+      m78["R32: 🇨🇮 C. d'Ivoire 1-2 🇳🇴 Norway → 🇳🇴 Norway"]:::miss
+      m79["R32: 🇲🇽 Mexico 2-0 🇪🇨 Ecuador → 🇲🇽 Mexico"]:::hit
+      m80["R32: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England 2-1 🇨🇩 DR Congo → 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England"]:::hit
+      m76 --> m78
+      m78 --> m79
+      m79 --> m80
+    end
+    subgraph koPath100["QF 100"]
+      direction TB
+      m85["R32: 🇨🇭 Swiss 2-0 🇩🇿 Algeria → 🇨🇭 Swiss"]:::hit
+      m87["R32: 🇨🇴 Colombia 1-0 🇬🇭 Ghana → 🇨🇴 Colombia"]:::hit
+      m86["R32: 🇦🇷 Argentina 1-1* 🇨🇻 C. Verde → 🇦🇷 Argentina"]:::hit
+      m88["R32: 🇦🇺 Australia 1-1* 🇪🇬 Egypt → 🇪🇬 Egypt"]:::miss
+      m85 --> m87
+      m87 --> m86
+      m86 --> m88
+    end
+    koPath97 --> koPath98
+    koPath98 --> koPath99
+    koPath99 --> koPath100
+  end
+
+  subgraph sgR16["3. R16"]
+    direction LR
+    subgraph r16Path97["QF 97"]
+      direction TB
+      m90["R16: 🇨🇦 Canada 0-3 🇲🇦 Morocco → 🇲🇦 Morocco"]:::miss
+      m89["R16: 🇵🇾 Paraguay 0-1 🇫🇷 France → 🇫🇷 France"]:::hit
+      m90 --> m89
+    end
+    subgraph r16Path98["QF 98"]
+      direction TB
+      m94["R16: 🇺🇸 USA 1-4 🇧🇪 Belgium → 🇧🇪 Belgium"]:::hit
+      m93["R16: 🇵🇹 Portugal 0-1 🇪🇸 Spain → 🇪🇸 Spain"]:::hit
+      m94 --> m93
+    end
+    subgraph r16Path99["QF 99"]
+      direction TB
+      m91["R16: 🇧🇷 Brazil 1-2 🇳🇴 Norway → 🇳🇴 Norway"]:::miss
+      m92["R16: 🇲🇽 Mexico 2-3 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England → 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England"]:::hit
+      m91 --> m92
+    end
+    subgraph r16Path100["QF 100"]
+      direction TB
+      m96["R16: 🇨🇭 Swiss 0-0* 🇨🇴 Colombia → 🇨🇭 Swiss"]:::miss
+      m95["R16: 🇦🇷 Argentina 3-2 🇪🇬 Egypt → 🇦🇷 Argentina"]:::hit
+      m96 --> m95
+    end
+    r16Path97 --> r16Path98
+    r16Path98 --> r16Path99
+    r16Path99 --> r16Path100
+  end
+
+  subgraph sgQF["4. QF"]
+    direction LR
+    subgraph qfPath97["QF 97"]
+      direction TB
+      m97["QF: 🇫🇷 France 2-0 🇲🇦 Morocco → 🇫🇷 France"]:::hit
+    end
+    subgraph qfPath98["QF 98"]
+      direction TB
+      m98["QF: 🇪🇸 Spain 2-1 🇧🇪 Belgium → 🇪🇸 Spain"]:::hit
+    end
+    subgraph qfPath99["QF 99"]
+      direction TB
+      m99["QF: 🇳🇴 Norway 1-1* 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England → 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England"]:::miss
+    end
+    subgraph qfPath100["QF 100"]
+      direction TB
+      m100["QF: 🇦🇷 Argentina 1-1* 🇨🇭 Swiss → 🇦🇷 Argentina"]:::hit
+    end
+    qfPath97 --> qfPath98
+    qfPath98 --> qfPath99
+    qfPath99 --> qfPath100
+  end
+
+  subgraph sgSF["5. SF"]
+    direction LR
+    subgraph sfPath101["SF 101 · W97 vs W98"]
+      direction TB
+      m101["SF: 🇫🇷 France vs 🇪🇸 Spain"]:::pending
+    end
+    subgraph sfPath102["SF 102 · W99 vs W100"]
+      direction TB
+      m102["SF: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇦🇷 Argentina"]:::pending
+    end
+    sfPath101 --> sfPath102
+  end
+
+  subgraph sgFinalists["6. Finalists"]
+    direction LR
+    m104["F: 🏳️ W101 vs 🏳️ W102"]:::pending
+  end
+
+  subgraph sgWinner["7. Winner"]
+    direction LR
+    champion["Champion TBD · predicted: 🇪🇸 Spain"]:::pending
+  end
+
+  sgPlacement --> sgKnockout
+  sgKnockout --> sgR16
+  sgR16 --> sgQF
+  sgQF --> sgSF
+  sgSF --> sgFinalists
+  sgFinalists --> sgWinner
+```
+
+### Knockout prediction hits
+
+| Stage | Predicted teams that arrived | Misses |
+|:---|:---|:---|
+| R16 | Argentina, Belgium, Brazil, Canada, Colombia, England, France, Mexico, Portugal, Spain, Switzerland, USA | Ecuador, Germany, Netherlands, Turkey |
+| QF | Argentina, Belgium, England, France, Spain | Brazil, Netherlands, Portugal |
+| SF | Argentina, France, Spain | Brazil |
+| Final | _pending_ | _pending_ |
+| Champion | _pending_ | _pending_ |
 
 ## 📊 Group Placements
 
@@ -135,7 +334,7 @@
 | 3rd | 🇬🇭 Ghana | 🇬🇭 Ghana | 4 | 0 | 3 | ✅ |
 | 4th | 🇵🇦 Panama | 🇵🇦 Panama | 0 | -4 | 3 | ✅ |
 
-## 🏆 Knockout Bracket
+## 🏆 Predicted Knockout Picks
 
 ### Round of 32
 

@@ -69,6 +69,44 @@ KNOCKOUT_ADVANCEMENT = [
     ("winner", "winner", range(104, 105), 1),
 ]
 
+# FIFA 2026 knockout topology: child match_num -> (parent_a, parent_b).
+# R32 matches 73-88 have no parents (seeded from groups).
+BRACKET_CHILDREN = {
+    89: (74, 77),
+    90: (73, 75),
+    91: (76, 78),
+    92: (79, 80),
+    93: (83, 84),
+    94: (81, 82),
+    95: (86, 88),
+    96: (85, 87),
+    97: (89, 90),
+    98: (93, 94),
+    99: (91, 92),
+    100: (95, 96),
+    101: (97, 98),
+    102: (99, 100),
+    104: (101, 102),
+}
+
+# Winning a match in this range advances the team into the listed prediction stage.
+MATCH_ADVANCES_TO = {
+    **{n: "round_of_16" for n in range(73, 89)},
+    **{n: "quarter_finals" for n in range(89, 97)},
+    **{n: "semi_finals" for n in range(97, 101)},
+    **{n: "finalists" for n in range(101, 103)},
+    104: "winner",
+}
+
+ROUND_LABEL = {
+    "round_of_32": "R32",
+    "round_of_16": "R16",
+    "quarter_finals": "QF",
+    "semi_finals": "SF",
+    "final": "F",
+    "winner": "Champ",
+}
+
 EMOJI_CHECK = "✅"
 EMOJI_WRONG = "❌"
 EMOJI_TIE = "🟰"
@@ -455,9 +493,693 @@ def render_group_placements(bracket, per_team_probs, fixtures, results_parsed):
     return lines
 
 
+def ko_by_match_num(ko_parsed):
+    by_num = {}
+    for match in ko_parsed.values():
+        match_num = match.get("match_num")
+        if match_num is not None:
+            by_num[match_num] = match
+    return by_num
+
+
+def predicted_stage_sets(bracket):
+    return {
+        "round_of_16": {nteam(t) for t in bracket.get("round_of_16", [])},
+        "quarter_finals": {nteam(t) for t in bracket.get("quarter_finals", [])},
+        "semi_finals": {nteam(t) for t in bracket.get("semi_finals", [])},
+        "finalists": {nteam(t) for t in bracket.get("finalists", [])},
+        "winner": {nteam(bracket["winner"])} if bracket.get("winner") else set(),
+        "round_of_32": {nteam(t) for t in bracket.get("round_of_32", [])},
+    }
+
+
+def mermaid_escape(text):
+    """Escape text for Mermaid node labels (GitHub-compatible)."""
+    return (
+        str(text)
+        .replace('"', "'")
+        .replace("[", "(")
+        .replace("]", ")")
+        .replace("\n", " ")
+    )
+
+
+def short_team(name):
+    """Compact display name for Mermaid nodes."""
+    name = nteam(name) if name else "?"
+    aliases = {
+        "Bosnia and Herzegovina": "Bosnia",
+        "Czech Republic": "Czechia",
+        "South Korea": "S. Korea",
+        "South Africa": "S. Africa",
+        "Saudi Arabia": "Saudi",
+        "New Zealand": "N. Zealand",
+        "Ivory Coast": "C. d'Ivoire",
+        "Netherlands": "Neth.",
+        "Switzerland": "Swiss",
+        "DR Congo": "DR Congo",
+        "Cape Verde": "C. Verde",
+        "United States": "USA",
+    }
+    return aliases.get(name, name)
+
+
+def match_css_class(match, predicted_sets):
+    """Color class for a match node: hit / miss / pending."""
+    if not match or not match.get("played"):
+        return "pending"
+    winner = nteam(match["winner"])
+    advances_to = MATCH_ADVANCES_TO.get(match.get("match_num"))
+    if not advances_to:
+        return "pending"
+    if advances_to == "winner":
+        return "hit" if winner in predicted_sets["winner"] else "miss"
+    predicted = predicted_sets.get(advances_to, set())
+    return "hit" if winner in predicted else "miss"
+
+
+def format_match_label(match_num, match, round_key, compact=False):
+    round_tag = ROUND_LABEL.get(round_key, str(match_num))
+    if not match:
+        return f"{round_tag} #{match_num}: TBD"
+    t1 = f"{flag(match['team1'])} {short_team(match['team1'])}"
+    t2 = f"{flag(match['team2'])} {short_team(match['team2'])}"
+    if not match.get("played") or match.get("score1") is None or match.get("score2") is None:
+        if compact:
+            return f"{round_tag}: {t1} vs {t2}"
+        return f"{round_tag} #{match_num}: {t1} vs {t2}"
+    s1, s2 = match["score1"], match["score2"]
+    w_short = f"{flag(match['winner'])} {short_team(match['winner'])}"
+    suffix = "*" if s1 == s2 else ""  # * = AET/pens
+    if compact:
+        return f"{round_tag}: {t1} {s1}-{s2}{suffix} {t2} → {w_short}"
+    return f"{round_tag} #{match_num}: {t1} {s1}-{s2} {t2}{suffix} → {w_short}"
+
+
+def resolve_bracket_match(match_num, by_num, round_key):
+    """Return match dict, synthesizing pending SF/Final from parent winners."""
+    match = by_num.get(match_num)
+    if match is not None:
+        return match
+    if match_num not in BRACKET_CHILDREN:
+        return None
+    pa, pb = BRACKET_CHILDREN[match_num]
+    wa = by_num.get(pa)
+    wb = by_num.get(pb)
+    t1 = wa["winner"] if wa and wa.get("played") else f"W{pa}"
+    t2 = wb["winner"] if wb and wb.get("played") else f"W{pb}"
+    return {
+        "team1": t1,
+        "team2": t2,
+        "score1": None,
+        "score2": None,
+        "winner": "draw",
+        "played": False,
+        "match_num": match_num,
+        "round": round_key if round_key != "final" else "final",
+    }
+
+
+def placement_group_summary(bracket, fixtures, results_parsed, group_letter):
+    """Return (label, css_class) for one group's predicted vs actual placement."""
+    predicted = bracket["group_placements"].get(group_letter, [])
+    fixture_group = f"Group {group_letter}"
+    group_matches = [m for m in fixtures if m.get("group") == fixture_group]
+    if not group_matches:
+        return f"Group {group_letter}: n/a", "pending"
+    if not is_group_complete(group_matches, results_parsed):
+        return f"{group_letter}: pending", "pending"
+    ranked, _, _ = compute_group_standings(fixtures, results_parsed, fixture_group)
+    correct = sum(
+        1 for i in range(4)
+        if i < len(predicted) and i < len(ranked) and same_team(predicted[i], ranked[i])
+    )
+    # Keep full team names; Mermaid is configured to use its natural full width.
+    marks = []
+    for i in range(4):
+        pred = (
+            f"{flag(predicted[i])} {short_team(predicted[i])}"
+            if i < len(predicted)
+            else "?"
+        )
+        if same_team(predicted[i], ranked[i]):
+            marks.append(f"{pred}+")
+        else:
+            marks.append(f"{pred}×")
+    label = f"{group_letter}: {correct}/4 {' '.join(marks)}"
+    if correct == 4:
+        css = "hit"
+    elif correct == 0:
+        css = "miss"
+    else:
+        css = "partial"
+    return label, css
+
+
+def emit_match_node(lines, node_classes, by_num, predicted_sets, match_num, round_key, indent="    "):
+    """Append one Mermaid match node and record its CSS class."""
+    match = resolve_bracket_match(match_num, by_num, round_key)
+    label_round = "final" if match_num == 104 else round_key
+    label = mermaid_escape(
+        format_match_label(match_num, match, label_round, compact=True)
+    )
+    node_id = f"m{match_num}"
+    css = match_css_class(match, predicted_sets)
+    lines.append(f'{indent}{node_id}["{label}"]:::{css}')
+    node_classes[node_id] = css
+
+
+def render_bracket_mermaid(bracket, ko_parsed, fixtures=None, results_parsed=None):
+    """
+    GitHub-compatible Mermaid flowchart with both:
+
+    1. Stage order: Placement → Knockout → R16 → QF → SF → Finals → Winner
+    2. Bracket-path grouping inside each knockout stage (paths to each QF / SF)
+    """
+    by_num = ko_by_match_num(ko_parsed)
+    predicted_sets = predicted_stage_sets(bracket)
+    fixtures = fixtures or []
+    results_parsed = results_parsed or {}
+    lines = []
+    lines.append("## 🗺️ Bracket Progress vs Prediction\n")
+    lines.append(
+        "Reads **top → bottom**: Placement → Knockout → R16 → QF → SF → Finals → Winner. "
+        "Inside each stage, matches stay grouped by bracket path (`→ QF 97`, etc.). "
+        "Node color shows prediction accuracy:\n"
+    )
+    lines.append("- 🟢 **Green** — predicted correctly for this stage")
+    lines.append("- 🟡 **Yellow** — partial group placement hit")
+    lines.append("- 🔴 **Red** — miss / upset vs prediction")
+    lines.append("- ⚪ **Gray** — not resolved yet")
+    lines.append("- `*` on a score — decided in extra time or penalties\n")
+
+    pred_path = []
+    if bracket.get("winner"):
+        pred_path.append(f"Champion: {bracket['winner']}")
+    if bracket.get("finalists"):
+        pred_path.append("Final: " + " vs ".join(sorted(bracket["finalists"])))
+    if bracket.get("semi_finals"):
+        pred_path.append("SF: " + ", ".join(sorted(bracket["semi_finals"])))
+    if pred_path:
+        lines.append("**Predicted deep run:** " + " · ".join(pred_path) + "\n")
+
+    def start_stage_chart(title):
+        """Start a standalone stage diagram so GitHub cannot reorder stages."""
+        lines.append(f"### {title}\n")
+        lines.append("```mermaid")
+        lines.append("flowchart TB")
+        lines.append(
+            "  classDef hit fill:#d1fae5,stroke:#059669,color:#064e3b,stroke-width:2px"
+        )
+        lines.append(
+            "  classDef miss fill:#fee2e2,stroke:#dc2626,color:#7f1d1d,stroke-width:2px"
+        )
+        lines.append(
+            "  classDef partial fill:#fef9c3,stroke:#ca8a04,color:#713f12,stroke-width:2px"
+        )
+        lines.append(
+            "  classDef pending fill:#f3f4f6,stroke:#9ca3af,color:#374151,stroke-width:1px"
+        )
+        lines.append(
+            "  classDef champ fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:3px"
+        )
+        lines.append("")
+
+    def end_stage_chart():
+        lines.append("```")
+        lines.append("")
+
+    node_classes = {}
+
+    # Path groupings that feed each quarter-final (used across Knockout / R16 / QF).
+    qf_paths = [
+        ("QF97", "→ QF 97", {
+            "round_of_32": [73, 75, 74, 77],
+            "round_of_16": [90, 89],
+            "quarter_finals": [97],
+        }),
+        ("QF99", "→ QF 99", {
+            "round_of_32": [76, 78, 79, 80],
+            "round_of_16": [91, 92],
+            "quarter_finals": [99],
+        }),
+        ("QF98", "→ QF 98", {
+            "round_of_32": [81, 82, 83, 84],
+            "round_of_16": [94, 93],
+            "quarter_finals": [98],
+        }),
+        ("QF100", "→ QF 100", {
+            "round_of_32": [85, 87, 86, 88],
+            "round_of_16": [96, 95],
+            "quarter_finals": [100],
+        }),
+    ]
+
+    def chain_nodes(node_ids):
+        """Force a vertical sequence inside a stage/path group."""
+        for left, right in zip(node_ids, node_ids[1:]):
+            lines.append(f"  {left} --> {right}")
+
+    # Separate blocks enforce this exact Markdown order on GitHub.
+    start_stage_chart("1. Placement")
+    lines.append('  subgraph sgPlacement["Placement"]')
+    lines.append("    direction TB")
+    placement_bands = [
+        ("placeAD", "Groups A–D", ["A", "B", "C", "D"]),
+        ("placeEH", "Groups E–H", ["E", "F", "G", "H"]),
+        ("placeIL", "Groups I–L", ["I", "J", "K", "L"]),
+    ]
+    placement_nodes = []
+    for band_id, band_title, letters in placement_bands:
+        lines.append(f'    subgraph {band_id}["{band_title}"]')
+        lines.append("      direction TB")
+        band_nodes = []
+        for letter in letters:
+            if letter not in bracket.get("group_placements", {}):
+                continue
+            label, css = placement_group_summary(
+                bracket, fixtures, results_parsed, letter
+            )
+            node_id = f"grp{letter}"
+            lines.append(f'      {node_id}["{mermaid_escape(label)}"]:::{css}')
+            node_classes[node_id] = css
+            band_nodes.append(node_id)
+            placement_nodes.append(node_id)
+        lines.append("    end")
+        # Chain within band so groups stack, not sit side-by-side
+        for left, right in zip(band_nodes, band_nodes[1:]):
+            lines.append(f"      {left} --> {right}")
+    lines.append("  end")
+    lines.append("")
+    # Chain bands: D → E, H → I
+    if "grpD" in placement_nodes and "grpE" in placement_nodes:
+        lines.append("  grpD --> grpE")
+    if "grpH" in placement_nodes and "grpI" in placement_nodes:
+        lines.append("  grpH --> grpI")
+    lines.append("")
+    end_stage_chart()
+
+    # 2. Knockout (R32) — path groups stacked vertically
+    start_stage_chart("2. Knockout")
+    lines.append('  subgraph sgKnockout["Knockout (R32)"]')
+    lines.append("    direction TB")
+    knockout_path_tails = []
+    knockout_path_heads = []
+    for path_id, path_title, path_matches in qf_paths:
+        lines.append(f'    subgraph ko{path_id}["{path_title}"]')
+        lines.append("      direction TB")
+        path_nodes = []
+        for match_num in path_matches["round_of_32"]:
+            emit_match_node(
+                lines, node_classes, by_num, predicted_sets,
+                match_num, "round_of_32", indent="      ",
+            )
+            path_nodes.append(f"m{match_num}")
+        lines.append("    end")
+        for left, right in zip(path_nodes, path_nodes[1:]):
+            lines.append(f"      {left} --> {right}")
+        knockout_path_heads.append(path_nodes[0])
+        knockout_path_tails.append(path_nodes[-1])
+    lines.append("  end")
+    lines.append("")
+    # Stack path groups under each other
+    for left, right in zip(knockout_path_tails, knockout_path_heads[1:]):
+        lines.append(f"  {left} --> {right}")
+    lines.append("")
+    end_stage_chart()
+
+    # 3. R16 — path groups stacked vertically
+    start_stage_chart("3. R16")
+    lines.append('  subgraph sgR16["R16"]')
+    lines.append("    direction TB")
+    r16_path_tails = []
+    r16_path_heads = []
+    for path_id, path_title, path_matches in qf_paths:
+        lines.append(f'    subgraph r16{path_id}["{path_title}"]')
+        lines.append("      direction TB")
+        path_nodes = []
+        for match_num in path_matches["round_of_16"]:
+            emit_match_node(
+                lines, node_classes, by_num, predicted_sets,
+                match_num, "round_of_16", indent="      ",
+            )
+            path_nodes.append(f"m{match_num}")
+        lines.append("    end")
+        for left, right in zip(path_nodes, path_nodes[1:]):
+            lines.append(f"      {left} --> {right}")
+        r16_path_heads.append(path_nodes[0])
+        r16_path_tails.append(path_nodes[-1])
+    lines.append("  end")
+    lines.append("")
+    for left, right in zip(r16_path_tails, r16_path_heads[1:]):
+        lines.append(f"  {left} --> {right}")
+    lines.append("")
+    end_stage_chart()
+
+    # 4. QF — path groups stacked vertically
+    start_stage_chart("4. QF")
+    lines.append('  subgraph sgQF["Quarter-Finals"]')
+    lines.append("    direction TB")
+    qf_nodes = []
+    for path_id, path_title, path_matches in qf_paths:
+        lines.append(f'    subgraph qf{path_id}["{path_title}"]')
+        lines.append("      direction TB")
+        for match_num in path_matches["quarter_finals"]:
+            emit_match_node(
+                lines, node_classes, by_num, predicted_sets,
+                match_num, "quarter_finals", indent="      ",
+            )
+            qf_nodes.append(f"m{match_num}")
+        lines.append("    end")
+    lines.append("  end")
+    lines.append("")
+    chain_nodes(qf_nodes)
+    lines.append("")
+    end_stage_chart()
+
+    # 5. SF — stacked
+    start_stage_chart("5. SF")
+    lines.append('  subgraph sgSF["Semi-Finals"]')
+    lines.append("    direction TB")
+    lines.append('    subgraph sf101["→ SF 101 (W97 vs W98)"]')
+    lines.append("      direction TB")
+    emit_match_node(
+        lines, node_classes, by_num, predicted_sets, 101, "semi_finals", indent="      ",
+    )
+    lines.append("    end")
+    lines.append('    subgraph sf102["→ SF 102 (W99 vs W100)"]')
+    lines.append("      direction TB")
+    emit_match_node(
+        lines, node_classes, by_num, predicted_sets, 102, "semi_finals", indent="      ",
+    )
+    lines.append("    end")
+    lines.append("  end")
+    lines.append("")
+    lines.append("  m101 --> m102")
+    lines.append("")
+    end_stage_chart()
+
+    # 6. Finals
+    start_stage_chart("6. Finals")
+    lines.append('  subgraph sgFinals["Final"]')
+    lines.append("    direction TB")
+    emit_match_node(
+        lines, node_classes, by_num, predicted_sets, 104, "final", indent="    ",
+    )
+    lines.append("  end")
+    lines.append("")
+    end_stage_chart()
+
+    # 7. Winner
+    start_stage_chart("7. Winner")
+    lines.append('  subgraph sgWinner["Winner"]')
+    lines.append("    direction TB")
+    final_match = resolve_bracket_match(104, by_num, "final")
+    if final_match and final_match.get("played"):
+        champ = short_team(final_match["winner"])
+        champion_css = (
+            "champ" if nteam(final_match["winner"]) in predicted_sets["winner"] else "miss"
+        )
+        lines.append(
+            f'    champion["Champion: {mermaid_escape(champ)}"]:::{champion_css}'
+        )
+        node_classes["champion"] = champion_css
+    else:
+        pred_champ = short_team(bracket.get("winner", "TBD"))
+        lines.append(
+            f'    champion["Champion TBD — predicted: {mermaid_escape(pred_champ)}"]:::pending'
+        )
+        node_classes["champion"] = "pending"
+    lines.append("  end")
+    lines.append("")
+    end_stage_chart()
+
+    # Compact prediction accuracy strip for knockout stages
+    lines.append("### Knockout prediction hits\n")
+    lines.append("| Stage | Predicted teams that arrived | Misses |")
+    lines.append("|:---|:---|:---|")
+    stage_rows = [
+        ("R16", predicted_sets["round_of_16"], range(73, 89), 16),
+        ("QF", predicted_sets["quarter_finals"], range(89, 97), 8),
+        ("SF", predicted_sets["semi_finals"], range(97, 101), 4),
+        ("Final", predicted_sets["finalists"], range(101, 103), 2),
+        ("Champion", predicted_sets["winner"], range(104, 105), 1),
+    ]
+    for stage, pred, match_range, expected in stage_rows:
+        if not is_knockout_round_complete(ko_parsed, match_range, expected):
+            lines.append(f"| {stage} | _pending_ | _pending_ |")
+            continue
+        actual = knockout_round_winners(ko_parsed, match_range)
+        hits = sorted(pred & actual)
+        misses = sorted(pred - actual)
+        hit_s = ", ".join(hits) if hits else "—"
+        miss_s = ", ".join(misses) if misses else "—"
+        lines.append(f"| {stage} | {hit_s} | {miss_s} |")
+    lines.append("")
+    return lines
+
+
+def render_vertical_bracket_mermaid(
+    bracket, ko_parsed, fixtures=None, results_parsed=None
+):
+    """
+    Render one strictly top-to-bottom Mermaid chart.
+
+    Mermaid may reorder nested subgraphs regardless of ``flowchart TB``. This
+    representation uses stage and path header nodes in one explicit chain, so
+    GitHub must preserve Placement → Winner order while retaining grouping.
+    """
+    by_num = ko_by_match_num(ko_parsed)
+    predicted_sets = predicted_stage_sets(bracket)
+    fixtures = fixtures or []
+    results_parsed = results_parsed or {}
+
+    lines = []
+    lines.append("## 🗺️ Bracket Progress vs Prediction\n")
+    lines.append(
+        "One chart with stage rows read **top → bottom**. Within each row, "
+        "the requested groups run **left → right**.\n"
+    )
+    lines.append("- 🟢 **Green** — predicted correctly for this stage")
+    lines.append("- 🟡 **Yellow** — partial group placement hit")
+    lines.append("- 🔴 **Red** — miss / upset vs prediction")
+    lines.append("- ⚪ **Gray** — not resolved yet")
+    lines.append("- `*` on a score — decided in extra time or penalties\n")
+
+    pred_path = []
+    if bracket.get("winner"):
+        pred_path.append(f"Champion: {bracket['winner']}")
+    if bracket.get("finalists"):
+        pred_path.append("Final: " + " vs ".join(sorted(bracket["finalists"])))
+    if bracket.get("semi_finals"):
+        pred_path.append("SF: " + ", ".join(sorted(bracket["semi_finals"])))
+    if pred_path:
+        lines.append("**Predicted deep run:** " + " · ".join(pred_path) + "\n")
+
+    lines.append("```mermaid")
+    lines.append(
+        "%%{init: {\"flowchart\": {\"useMaxWidth\": false, \"nodeSpacing\": 48, "
+        "\"rankSpacing\": 48}, \"themeVariables\": {\"fontSize\": \"14px\"}}}%%"
+    )
+    lines.append("flowchart TB")
+    lines.append(
+        "  classDef hit fill:#d1fae5,stroke:#059669,color:#064e3b,stroke-width:2px"
+    )
+    lines.append(
+        "  classDef miss fill:#fee2e2,stroke:#dc2626,color:#7f1d1d,stroke-width:2px"
+    )
+    lines.append(
+        "  classDef partial fill:#fef9c3,stroke:#ca8a04,color:#713f12,stroke-width:2px"
+    )
+    lines.append(
+        "  classDef pending fill:#f3f4f6,stroke:#9ca3af,color:#374151,stroke-width:1px"
+    )
+    lines.append(
+        "  classDef champ fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:3px"
+    )
+    lines.append("")
+
+    def append_match(match_num, round_key, indent="      "):
+        match = resolve_bracket_match(match_num, by_num, round_key)
+        label_round = "final" if match_num == 104 else round_key
+        label = mermaid_escape(
+            format_match_label(match_num, match, label_round, compact=True)
+        )
+        css = match_css_class(match, predicted_sets)
+        lines.append(f'{indent}m{match_num}["{label}"]:::{css}')
+
+    def append_match_group(group_id, title, match_nums, round_key):
+        lines.append(f'    subgraph {group_id}["{title}"]')
+        lines.append("      direction TB")
+        node_ids = []
+        for match_num in match_nums:
+            append_match(match_num, round_key)
+            node_ids.append(f"m{match_num}")
+        for left, right in zip(node_ids, node_ids[1:]):
+            lines.append(f"      {left} --> {right}")
+        lines.append("    end")
+
+    # Path order requested for every knockout row.
+    qf_paths = [
+        ("97", [73, 75, 74, 77], [90, 89], [97]),
+        ("98", [81, 82, 83, 84], [94, 93], [98]),
+        ("99", [76, 78, 79, 80], [91, 92], [99]),
+        ("100", [85, 87, 86, 88], [96, 95], [100]),
+    ]
+
+    # Row 1: Placement; three horizontal groups with vertical contents.
+    lines.append('  subgraph sgPlacement["1. Placement"]')
+    lines.append("    direction LR")
+    placement_bands = [
+        ("placeAD", "Groups A–D", ["A", "B", "C", "D"]),
+        ("placeEH", "Groups E–H", ["E", "F", "G", "H"]),
+        ("placeIL", "Groups I–L", ["I", "J", "K", "L"]),
+    ]
+    for band_id, band_title, letters in placement_bands:
+        lines.append(f'    subgraph {band_id}["{band_title}"]')
+        lines.append("      direction TB")
+        group_nodes = []
+        for letter in letters:
+            if letter not in bracket.get("group_placements", {}):
+                continue
+            label, css = placement_group_summary(
+                bracket, fixtures, results_parsed, letter
+            )
+            lines.append(
+                f'      grp{letter}["{mermaid_escape(label)}"]:::{css}'
+            )
+            group_nodes.append(f"grp{letter}")
+        for left, right in zip(group_nodes, group_nodes[1:]):
+            lines.append(f"      {left} --> {right}")
+        lines.append("    end")
+    # Linking the subgraphs (not their nodes) preserves each group's TB
+    # direction and forces the group containers onto one LR row.
+    lines.append("    placeAD --> placeEH")
+    lines.append("    placeEH --> placeIL")
+    lines.append("  end")
+    lines.append("")
+
+    # Row 2: Knockout; four horizontal QF-path groups.
+    lines.append('  subgraph sgKnockout["2. Knockout"]')
+    lines.append("    direction LR")
+    for path_id, r32_matches, _, _ in qf_paths:
+        append_match_group(
+            f"koPath{path_id}", f"QF {path_id}", r32_matches, "round_of_32"
+        )
+    lines.append("    koPath97 --> koPath98")
+    lines.append("    koPath98 --> koPath99")
+    lines.append("    koPath99 --> koPath100")
+    lines.append("  end")
+    lines.append("")
+
+    # Row 3: R16; same four horizontal path groups.
+    lines.append('  subgraph sgR16["3. R16"]')
+    lines.append("    direction LR")
+    for path_id, _, r16_matches, _ in qf_paths:
+        append_match_group(
+            f"r16Path{path_id}", f"QF {path_id}", r16_matches, "round_of_16"
+        )
+    lines.append("    r16Path97 --> r16Path98")
+    lines.append("    r16Path98 --> r16Path99")
+    lines.append("    r16Path99 --> r16Path100")
+    lines.append("  end")
+    lines.append("")
+
+    # Row 4: QF; one match in each horizontal path group.
+    lines.append('  subgraph sgQF["4. QF"]')
+    lines.append("    direction LR")
+    for path_id, _, _, qf_matches in qf_paths:
+        append_match_group(
+            f"qfPath{path_id}", f"QF {path_id}", qf_matches, "quarter_finals"
+        )
+    lines.append("    qfPath97 --> qfPath98")
+    lines.append("    qfPath98 --> qfPath99")
+    lines.append("    qfPath99 --> qfPath100")
+    lines.append("  end")
+    lines.append("")
+
+    # Row 5: SF; two horizontal bracket halves.
+    lines.append('  subgraph sgSF["5. SF"]')
+    lines.append("    direction LR")
+    append_match_group(
+        "sfPath101", "SF 101 · W97 vs W98", [101], "semi_finals"
+    )
+    append_match_group(
+        "sfPath102", "SF 102 · W99 vs W100", [102], "semi_finals"
+    )
+    lines.append("    sfPath101 --> sfPath102")
+    lines.append("  end")
+    lines.append("")
+
+    # Rows 6–7: Finalists and Winner.
+    lines.append('  subgraph sgFinalists["6. Finalists"]')
+    lines.append("    direction LR")
+    append_match(104, "final", indent="    ")
+    lines.append("  end")
+    lines.append("")
+
+    lines.append('  subgraph sgWinner["7. Winner"]')
+    lines.append("    direction LR")
+    final_match = resolve_bracket_match(104, by_num, "final")
+    if final_match and final_match.get("played"):
+        champ = (
+            f"{flag(final_match['winner'])} "
+            f"{short_team(final_match['winner'])}"
+        )
+        css = (
+            "champ"
+            if nteam(final_match["winner"]) in predicted_sets["winner"]
+            else "miss"
+        )
+        lines.append(f'    champion["Champion: {mermaid_escape(champ)}"]:::{css}')
+    else:
+        predicted_winner = bracket.get("winner", "TBD")
+        predicted = (
+            f"{flag(predicted_winner)} {short_team(predicted_winner)}"
+        )
+        lines.append(
+            f'    champion["Champion TBD · predicted: {mermaid_escape(predicted)}"]:::pending'
+        )
+    lines.append("  end")
+    lines.append("")
+
+    # Explicit subgraph-to-subgraph edges force stage rows top → bottom.
+    lines.append("  sgPlacement --> sgKnockout")
+    lines.append("  sgKnockout --> sgR16")
+    lines.append("  sgR16 --> sgQF")
+    lines.append("  sgQF --> sgSF")
+    lines.append("  sgSF --> sgFinalists")
+    lines.append("  sgFinalists --> sgWinner")
+    lines.append("```")
+    lines.append("")
+
+    lines.append("### Knockout prediction hits\n")
+    lines.append("| Stage | Predicted teams that arrived | Misses |")
+    lines.append("|:---|:---|:---|")
+    stage_rows = [
+        ("R16", predicted_sets["round_of_16"], range(73, 89), 16),
+        ("QF", predicted_sets["quarter_finals"], range(89, 97), 8),
+        ("SF", predicted_sets["semi_finals"], range(97, 101), 4),
+        ("Final", predicted_sets["finalists"], range(101, 103), 2),
+        ("Champion", predicted_sets["winner"], range(104, 105), 1),
+    ]
+    for stage, pred, match_range, expected in stage_rows:
+        if not is_knockout_round_complete(ko_parsed, match_range, expected):
+            lines.append(f"| {stage} | _pending_ | _pending_ |")
+            continue
+        actual = knockout_round_winners(ko_parsed, match_range)
+        hits = sorted(pred & actual)
+        misses = sorted(pred - actual)
+        hit_s = ", ".join(hits) if hits else "—"
+        miss_s = ", ".join(misses) if misses else "—"
+        lines.append(f"| {stage} | {hit_s} | {miss_s} |")
+    lines.append("")
+    return lines
+
+
 def render_knockout_bracket(bracket, per_team_probs):
     lines = []
-    lines.append("## 🏆 Knockout Bracket\n")
+    lines.append("## 🏆 Predicted Knockout Picks\n")
     r32_teams = bracket.get("round_of_32", [])
     r16_set = set(bracket.get("round_of_16", []))
     qf_set = set(bracket.get("quarter_finals", []))
@@ -599,6 +1321,11 @@ def generate_results(bracket_path, fixtures_path, results_path, output_path):
     L.append(f"- 📊 **Expected Score:** {expected_score:.2f} / 203\n")
 
     L.extend(render_scoring_summary(actual_scores, actual_points, total_played, total_correct))
+    L.extend(
+        render_vertical_bracket_mermaid(
+            bracket, ko_parsed, fixtures, results_parsed
+        )
+    )
     L.extend(render_group_placements(bracket, per_team_probs, fixtures, results_parsed))
     L.extend(render_knockout_bracket(bracket, per_team_probs))
     L.extend(render_champion_probabilities(per_team_probs))

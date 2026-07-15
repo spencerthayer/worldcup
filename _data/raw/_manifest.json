@@ -2,57 +2,57 @@
   {
     "source": "betexplorer",
     "file": "_data/raw/betexplorer/world-cup-calendar.ics",
-    "size_bytes": 335340,
+    "size_bytes": 346956,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:01.769588"
+    "timestamp": "2026-07-16T16:13:04.937113"
   },
   {
     "source": "polymarket",
     "file": "_data/raw/polymarket/events_worldcup.json",
-    "size_bytes": 12395388,
+    "size_bytes": 10840689,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:07.210063"
+    "timestamp": "2026-07-16T16:13:10.115536"
   },
   {
     "source": "polymarket",
     "file": "_data/raw/polymarket/markets_worldcup.json",
-    "size_bytes": 777052,
+    "size_bytes": 785942,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:07.795505"
+    "timestamp": "2026-07-16T16:13:10.697385"
   },
   {
     "source": "openfootball",
     "file": "_data/raw/openfootball/worldcup-2026.json",
     "size_bytes": 42015,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:08.405369"
+    "timestamp": "2026-07-16T16:13:11.363805"
   },
   {
     "source": "fivethirtyeight",
     "file": "_data/raw/fivethirtyeight/README.md",
     "size_bytes": 1411,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:12.001538"
+    "timestamp": "2026-07-16T16:13:14.985851"
   },
   {
     "source": "natesilver",
     "file": "_data/raw/natesilver/world-cup-2026-predictions.html",
-    "size_bytes": 201111,
+    "size_bytes": 204391,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:13.462588"
+    "timestamp": "2026-07-16T16:13:16.261777"
   },
   {
     "source": "covers",
     "file": "_data/raw/covers/odds.html",
-    "size_bytes": 437374,
+    "size_bytes": 431170,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:13.682450"
+    "timestamp": "2026-07-16T16:13:16.840221"
   },
   {
     "source": "oddsportal",
     "file": "_data/raw/oddsportal/world-championship-2026.html",
-    "size_bytes": 186576,
+    "size_bytes": 175572,
     "status": 200,
-    "timestamp": "2026-07-15T21:26:17.760407"
+    "timestamp": "2026-07-16T16:13:20.504008"
   }
 ]

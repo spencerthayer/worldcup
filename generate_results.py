@@ -51,21 +51,38 @@ FLAGS = {
 
 STAGE_POINTS = {
     "group_placement": 1, "group_advancement": 1, "round_of_32": 2, "round_of_16": 4,
-    "quarter_finals": 6, "semi_finals": 10, "finalists": 15, "winner": 15,
+    "quarter_finals": 6, "semi_finals": 10, "winner": 15,
 }
 
 STAGE_KEY = {
-    "group_advancement": "r32", "round_of_32": "r32", "round_of_16": "r16",
-    "quarter_finals": "qf", "semi_finals": "sf",
-    "finalists": "final", "winner": "champion",
+    "group_advancement": "r32", "round_of_32": "r16", "round_of_16": "qf",
+    "quarter_finals": "sf", "semi_finals": "final",
+    "winner": "champion",
+}
+
+# Map scoring stage → bracket key (for picking the right team list from bracket.json).
+# The bracket stores picks by stage the team *reaches*, so R32 match-winners
+# are under "round_of_16", R16 winners under "quarter_finals", etc.
+STAGE_BRACKET_KEY = {
+    "group_advancement": "round_of_32",
+    "round_of_32": "round_of_16",
+    "round_of_16": "quarter_finals",
+    "quarter_finals": "semi_finals",
+    "semi_finals": "finalists",
+    "winner": "winner",
 }
 
 # Prior-round winners determine whether a knockout advancement stage is resolved.
+# (score_key, bracket_key, match_num_range, expected_matches)
+# score_key selects the points from STAGE_POINTS; bracket_key selects the
+# predicted team list from bracket.json.  The bracket stores picks by the
+# stage the team *reaches*, so R32 match-winners live under "round_of_16",
+# R16 match-winners under "quarter_finals", etc.
 KNOCKOUT_ADVANCEMENT = [
-    ("round_of_16", "round_of_16", range(73, 89), 16),
-    ("quarter_finals", "quarter_finals", range(89, 97), 8),
-    ("semi_finals", "semi_finals", range(97, 101), 4),
-    ("finalists", "finalists", range(101, 103), 2),
+    ("round_of_32", "round_of_16", range(73, 89), 16),
+    ("round_of_16", "quarter_finals", range(89, 97), 8),
+    ("quarter_finals", "semi_finals", range(97, 101), 4),
+    ("semi_finals", "finalists", range(101, 103), 2),
     ("winner", "winner", range(104, 105), 1),
 ]
 
@@ -272,11 +289,10 @@ def compute_scores(bracket, fixtures, results_parsed, ko_parsed):
     scores = {
         "group_placement": {"correct": 0, "total": 0, "points": 0, "max": 48},
         "group_advancement": {"correct": 0, "total": 0, "points": 0, "max": 32},
-        "round_of_32": {"correct": 0, "total": 0, "points": 0, "max": 64},
-        "round_of_16": {"correct": 0, "total": 0, "points": 0, "max": 64, "pending": 0},
-        "quarter_finals": {"correct": 0, "total": 0, "points": 0, "max": 48, "pending": 0},
-        "semi_finals": {"correct": 0, "total": 0, "points": 0, "max": 40, "pending": 0},
-        "finalists": {"correct": 0, "total": 0, "points": 0, "max": 30, "pending": 0},
+        "round_of_32": {"correct": 0, "total": 0, "points": 0, "max": 32, "pending": 0},
+        "round_of_16": {"correct": 0, "total": 0, "points": 0, "max": 32, "pending": 0},
+        "quarter_finals": {"correct": 0, "total": 0, "points": 0, "max": 24, "pending": 0},
+        "semi_finals": {"correct": 0, "total": 0, "points": 0, "max": 20, "pending": 0},
         "winner": {"correct": 0, "total": 0, "points": 0, "max": 15, "pending": 0},
     }
     total_played = 0
@@ -337,31 +353,6 @@ def compute_scores(bracket, fixtures, results_parsed, ko_parsed):
             total_played += 1
         scores["group_advancement"]["total"] = len(predicted_adv)
 
-    if all_groups_complete:
-        predicted_r32 = {nteam(team) for team in bracket.get("round_of_32", [])}
-        actual_r32 = set()
-        all_thirds = []
-        for g in groups_list:
-            ranked, standings, _ = compute_group_standings(fixtures, results_parsed, g)
-            if len(ranked) >= 2:
-                actual_r32.add(nteam(ranked[0]))
-                actual_r32.add(nteam(ranked[1]))
-            if len(ranked) >= 3:
-                all_thirds.append((ranked[2], standings[ranked[2]]["pts"],
-                                  standings[ranked[2]]["gd"], standings[ranked[2]]["gf"]))
-        all_thirds.sort(key=lambda x: (-x[1], -x[2], -x[3]))
-        for team, _, _, _ in all_thirds[:8]:
-            actual_r32.add(nteam(team))
-        for team in sorted(predicted_r32):
-            if team in actual_r32:
-                scores["round_of_32"]["correct"] += 1
-                scores["round_of_32"]["points"] += STAGE_POINTS["round_of_32"]
-                total_correct += 1
-            total_played += 1
-        scores["round_of_32"]["total"] = len(predicted_r32)
-    else:
-        scores["round_of_32"]["pending"] = len(bracket.get("round_of_32", []))
-
     # ── Knockout advancement stages ──
     for score_key, bracket_key, match_num_range, expected_matches in KNOCKOUT_ADVANCEMENT:
         if score_key == "winner":
@@ -395,7 +386,7 @@ def compute_expected_score_from_probs(bracket, per_team_probs):
             w = bracket.get("winner", "")
             picks = [w] if w else []
         else:
-            picks = bracket.get(stage, [])
+            picks = bracket.get(STAGE_BRACKET_KEY.get(stage, stage), [])
         points = STAGE_POINTS[stage]
         for t in picks:
             p = per_team_probs.get(t, {}).get(key, 0)
@@ -406,7 +397,7 @@ def compute_expected_score_from_probs(bracket, per_team_probs):
 def render_scoring_summary(scores, total_points, total_played, total_correct):
     lines = []
     lines.append("## 📈 Scoring Summary\n")
-    max_total = 341
+    max_total = 203
     pct_val = (total_points / max_total * 100) if max_total > 0 else 0
     lines.append(f"**Current Score: {total_points:.0f} / {max_total} ({pct_val:.1f}%)**\n")
     if total_played > 0:
@@ -419,11 +410,10 @@ def render_scoring_summary(scores, total_points, total_played, total_correct):
     stage_names = {
         "group_placement": "Group Placement",
         "group_advancement": "Advance to Knockout",
-        "round_of_32": "Round of 32",
-        "round_of_16": "Round of 16",
-        "quarter_finals": "Quarterfinal",
-        "semi_finals": "Semifinal",
-        "finalists": "Final",
+        "round_of_32": "Advance to Round of 32",
+        "round_of_16": "Advance to Quarterfinal",
+        "quarter_finals": "Advance to Semifinal",
+        "semi_finals": "Finalist",
         "winner": "Champion",
     }
     for key, name in stage_names.items():
@@ -1345,7 +1335,7 @@ def generate_results(bracket_path, fixtures_path, results_path, output_path):
     if len(finalists) == 2:
         f1, f2 = sorted(finalists)
         L.append(f"- 🌟 **Predicted Final:** {flag(f1)} {f1} vs {flag(f2)} {f2}")
-    L.append(f"- 📊 **Expected Score:** {expected_score:.2f} / 341\n")
+    L.append(f"- 📊 **Expected Score:** {expected_score:.2f} / 203\n")
 
     L.extend(render_scoring_summary(actual_scores, actual_points, total_played, total_correct))
     L.extend(
@@ -1363,8 +1353,8 @@ def generate_results(bracket_path, fixtures_path, results_path, output_path):
         f.write("\n".join(L))
 
     print(f"Written {output_path}")
-    print(f"Expected Score: {expected_score:.2f} / 341")
-    print(f"Actual Score: {actual_points:.0f} / 341")
+    print(f"Expected Score: {expected_score:.2f} / 203")
+    print(f"Actual Score: {actual_points:.0f} / 203")
     print(f"Champion: {flag(winner)} {winner}")
     if total_played > 0:
         print(f"Accuracy: {total_correct}/{total_played} ({total_correct/total_played*100:.1f}%)")

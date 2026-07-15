@@ -1,30 +1,29 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-07-15T21:28:41.477461+00:00
+**Last updated:** 2026-07-16T16:13:20.595255+00:00
 
 ## 🎯 Summary
 
 - 👑 **Predicted Champion:** 🇪🇸 Spain (16.9%)
 - 🌟 **Predicted Final:** 🇦🇷 Argentina vs 🇪🇸 Spain
-- 📊 **Expected Score:** 157.41 / 341
+- 📊 **Expected Score:** 97.53 / 203
 
 ## 📈 Scoring Summary
 
-**Current Score: 221 / 341 (64.8%)**
+**Current Score: 123 / 203 (60.6%)**
 
-**Accuracy: 107/140 correct (76.4%)**
+**Accuracy: 81/108 correct (75.0%)**
 
 | Stage | Correct | Pts/Pick | Max | Pts Earned |
 |:---|:---:|:---:|:---:|:---:|
 | Group Placement | 35/48 | 1 | 48 | **35** |
 | Advance to Knockout | 26/32 | 1 | 32 | **26** |
-| Round of 32 | 26/32 | 2 | 64 | **52** |
-| Round of 16 | 12/16 | 4 | 64 | **48** |
-| Quarterfinal | 5/8 | 6 | 48 | **30** |
-| Semifinal | 3/4 | 10 | 40 | **30** |
-| Final | 0/0 (+2 pending) | 15 | 30 | **0** |
+| Advance to Round of 32 | 12/16 | 2 | 32 | **24** |
+| Advance to Quarterfinal | 5/8 | 4 | 32 | **20** |
+| Advance to Semifinal | 3/4 | 6 | 24 | **18** |
+| Finalist | 0/0 (+2 pending) | 10 | 20 | **0** |
 | Champion | 0/0 (+1 pending) | 15 | 15 | **0** |
-| **Total** | | | **341** | **221** |
+| **Total** | | | **203** | **123** |
 
 ## 🗺️ Bracket Progress vs Prediction
 

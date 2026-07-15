@@ -951,8 +951,16 @@
       "played": true,
       "match_num": 101,
       "round": "semi_finals"
+    },
+    "England_vs_Argentina": {
+      "team1": "England",
+      "team2": "Argentina",
+      "score1": 1,
+      "score2": 2,
+      "winner": "Argentina",
+      "played": true
     }
   },
-  "last_updated": "2026-07-15T15:09:24.872242+00:00",
+  "last_updated": "2026-07-15T21:26:29.647437+00:00",
   "source": "kubeia ICS calendar"
 }

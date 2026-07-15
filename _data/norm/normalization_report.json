@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-11T17:12:36.263253+00:00",
-  "total_rows": 398,
+  "generated_at": "2026-07-15T21:26:28.957111+00:00",
+  "total_rows": 326,
   "sources": {
-    "betexplorer": 72,
+    "betexplorer": 0,
     "uanalyse": 72,
     "worldcup-predictor": 72,
     "polymarket": 6,
@@ -10,5 +10,5 @@
     "fivethirtyeight-2014": 0,
     "oddsharvester": 72
   },
-  "unique_matches": 119
+  "unique_matches": 116
 }

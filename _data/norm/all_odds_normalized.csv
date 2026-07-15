@@ -1,76 +1,4 @@
 source,match_id,home_team,away_team,group,date,home_win_prob,draw_prob,away_win_prob,home_win_odds,draw_odds,away_win_odds,extra
-betexplorer,mexico_vs_south_africa,Mexico,South Africa,,2026-06-11,0.6737,0.214017,0.112283,1.42,4.47,8.52,
-betexplorer,south_korea_vs_czech_republic,South Korea,Czech Republic,,2026-06-12,0.358971,0.315137,0.325892,2.66,3.03,2.93,
-betexplorer,canada_vs_bosnia_and_herzegovina,Canada,Bosnia and Herzegovina,,2026-06-12,0.521065,0.269364,0.209571,1.83,3.54,4.55,
-betexplorer,usa_vs_paraguay,USA,Paraguay,,2026-06-13,0.494101,0.277214,0.228685,1.93,3.44,4.17,
-betexplorer,qatar_vs_switzerland,Qatar,Switzerland,,2026-06-13,0.07013,0.147522,0.782349,13.61,6.47,1.22,
-betexplorer,brazil_vs_morocco,Brazil,Morocco,,2026-06-13,0.570833,0.254891,0.174276,1.67,3.74,5.47,
-betexplorer,haiti_vs_scotland,Haiti,Scotland,,2026-06-14,0.161718,0.224799,0.613483,5.88,4.23,1.55,
-betexplorer,australia_vs_turkey,Australia,Turkey,,2026-06-14,0.187037,0.254051,0.558912,5.08,3.74,1.7,
-betexplorer,germany_vs_curaao,Germany,Curaçao,,2026-06-14,0.91947,0.058131,0.0224,1.04,16.45,42.69,
-betexplorer,netherlands_vs_japan,Netherlands,Japan,,2026-06-14,0.472463,0.269598,0.257939,2.02,3.54,3.7,
-betexplorer,ivory_coast_vs_ecuador,Ivory Coast,Ecuador,,2026-06-14,0.266105,0.340235,0.39366,3.58,2.8,2.42,
-betexplorer,sweden_vs_tunisia,Sweden,Tunisia,,2026-06-15,0.497772,0.277996,0.224232,1.91,3.42,4.24,
-betexplorer,spain_vs_cape_verde,Spain,Cape Verde,,2026-06-15,0.874176,0.08947,0.036355,1.09,10.65,26.21,
-betexplorer,belgium_vs_egypt,Belgium,Egypt,,2026-06-15,0.576663,0.247785,0.175552,1.65,3.84,5.42,
-betexplorer,saudi_arabia_vs_uruguay,Saudi Arabia,Uruguay,,2026-06-15,0.124259,0.219313,0.656428,7.66,4.34,1.45,
-betexplorer,iran_vs_new_zealand,Iran,New Zealand,,2026-06-16,0.519891,0.274179,0.205931,1.83,3.47,4.62,
-betexplorer,france_vs_senegal,France,Senegal,,2026-06-16,0.642874,0.221784,0.135342,1.48,4.29,7.03,
-betexplorer,iraq_vs_norway,Iraq,Norway,,2026-06-16,0.067136,0.140105,0.79276,14.17,6.79,1.2,
-betexplorer,argentina_vs_algeria,Argentina,Algeria,,2026-06-17,0.682788,0.209972,0.10724,1.39,4.52,8.85,
-betexplorer,austria_vs_jordan,Austria,Jordan,,2026-06-17,0.720672,0.176819,0.102509,1.32,5.38,9.28,
-betexplorer,portugal_vs_democratic_republic_of_the_congo,Portugal,Democratic Republic of the Congo,,2026-06-17,0.742202,0.17056,0.087238,1.28,5.57,10.89,
-betexplorer,england_vs_croatia,England,Croatia,,2026-06-17,0.550706,0.252043,0.197251,1.73,3.78,4.83,
-betexplorer,ghana_vs_panama,Ghana,Panama,,2026-06-17,0.447463,0.27787,0.274667,2.13,3.43,3.47,
-betexplorer,uzbekistan_vs_colombia,Uzbekistan,Colombia,,2026-06-18,0.108251,0.207975,0.683774,8.78,4.57,1.39,
-betexplorer,czech_republic_vs_south_africa,Czech Republic,South Africa,,2026-06-18,0.481697,0.286375,0.231928,1.95,3.28,4.05,
-betexplorer,switzerland_vs_bosnia_and_herzegovina,Switzerland,Bosnia and Herzegovina,,2026-06-18,0.590802,0.239636,0.169562,1.59,3.92,5.54,
-betexplorer,canada_vs_qatar,Canada,Qatar,,2026-06-18,0.719189,0.188805,0.092006,1.31,4.99,10.24,
-betexplorer,mexico_vs_south_korea,Mexico,South Korea,,2026-06-19,0.52343,0.267663,0.208908,1.8,3.52,4.51,
-betexplorer,usa_vs_australia,USA,Australia,,2026-06-19,0.54182,0.246798,0.211383,1.74,3.82,4.46,
-betexplorer,scotland_vs_morocco,Scotland,Morocco,,2026-06-19,0.233036,0.291476,0.475488,4.04,3.23,1.98,
-betexplorer,brazil_vs_haiti,Brazil,Haiti,,2026-06-20,0.880593,0.087978,0.031429,1.08,10.81,30.26,
-betexplorer,turkey_vs_paraguay,Turkey,Paraguay,,2026-06-20,0.422926,0.300928,0.276146,2.22,3.12,3.4,
-betexplorer,netherlands_vs_sweden,Netherlands,Sweden,,2026-06-20,0.577552,0.237131,0.185317,1.63,3.97,5.08,
-betexplorer,germany_vs_ivory_coast,Germany,Ivory Coast,,2026-06-20,0.60588,0.221489,0.172631,1.55,4.24,5.44,
-betexplorer,ecuador_vs_curaao,Ecuador,Curaçao,,2026-06-21,0.79342,0.138849,0.067731,1.19,6.8,13.94,
-betexplorer,tunisia_vs_japan,Tunisia,Japan,,2026-06-21,0.180485,0.266382,0.553133,5.21,3.53,1.7,
-betexplorer,spain_vs_saudi_arabia,Spain,Saudi Arabia,,2026-06-21,0.85956,0.099738,0.040702,1.1,9.48,23.23,
-betexplorer,belgium_vs_iran,Belgium,Iran,,2026-06-21,0.672551,0.204689,0.12276,1.4,4.6,7.67,
-betexplorer,uruguay_vs_cape_verde,Uruguay,Cape Verde,,2026-06-21,0.661615,0.211598,0.126787,1.42,4.44,7.41,
-betexplorer,new_zealand_vs_egypt,New Zealand,Egypt,,2026-06-22,0.202936,0.253945,0.543119,4.63,3.7,1.73,
-betexplorer,argentina_vs_austria,Argentina,Austria,,2026-06-22,0.576785,0.250709,0.172506,1.63,3.75,5.45,
-betexplorer,france_vs_iraq,France,Iraq,,2026-06-22,0.844645,0.11679,0.038565,1.12,8.1,24.53,
-betexplorer,norway_vs_senegal,Norway,Senegal,,2026-06-23,0.443891,0.274358,0.281751,2.12,3.43,3.34,
-betexplorer,jordan_vs_algeria,Jordan,Algeria,,2026-06-23,0.149462,0.228933,0.621605,6.28,4.1,1.51,
-betexplorer,portugal_vs_uzbekistan,Portugal,Uzbekistan,,2026-06-23,0.761407,0.152527,0.086066,1.24,6.19,10.97,
-betexplorer,england_vs_ghana,England,Ghana,,2026-06-23,0.718028,0.181586,0.100386,1.31,5.18,9.37,
-betexplorer,panama_vs_croatia,Panama,Croatia,,2026-06-23,0.146358,0.242548,0.611094,6.43,3.88,1.54,
-betexplorer,colombia_vs_democratic_republic_of_the_congo,Colombia,Democratic Republic of the Congo,,2026-06-24,0.644875,0.226326,0.128799,1.46,4.16,7.31,
-betexplorer,switzerland_vs_canada,Switzerland,Canada,,2026-06-24,0.444521,0.285957,0.269523,2.11,3.28,3.48,
-betexplorer,bosnia_and_herzegovina_vs_qatar,Bosnia and Herzegovina,Qatar,,2026-06-24,0.589825,0.248759,0.161415,1.59,3.77,5.81,
-betexplorer,scotland_vs_brazil,Scotland,Brazil,,2026-06-24,0.15176,0.201699,0.646541,6.22,4.68,1.46,
-betexplorer,morocco_vs_haiti,Morocco,Haiti,,2026-06-24,0.714301,0.185606,0.100093,1.32,5.08,9.42,
-betexplorer,south_africa_vs_south_korea,South Africa,South Korea,,2026-06-25,0.235871,0.280229,0.4839,3.98,3.35,1.94,
-betexplorer,czech_republic_vs_mexico,Czech Republic,Mexico,,2026-06-25,0.210224,0.267721,0.522056,4.47,3.51,1.8,
-betexplorer,ecuador_vs_germany,Ecuador,Germany,,2026-06-25,0.199481,0.253105,0.547414,4.72,3.72,1.72,
-betexplorer,curaao_vs_ivory_coast,Curaçao,Ivory Coast,,2026-06-25,0.074345,0.14718,0.778474,12.67,6.4,1.21,
-betexplorer,tunisia_vs_netherlands,Tunisia,Netherlands,,2026-06-25,0.148212,0.223371,0.628417,6.36,4.22,1.5,
-betexplorer,japan_vs_sweden,Japan,Sweden,,2026-06-25,0.451111,0.279259,0.26963,2.08,3.36,3.48,
-betexplorer,paraguay_vs_australia,Paraguay,Australia,,2026-06-26,0.435466,0.295789,0.268745,2.16,3.18,3.5,
-betexplorer,turkey_vs_usa,Turkey,USA,,2026-06-26,0.358271,0.270763,0.370966,2.63,3.48,2.54,
-betexplorer,norway_vs_france,Norway,France,,2026-06-26,0.220139,0.263798,0.516063,4.29,3.58,1.83,
-betexplorer,senegal_vs_iraq,Senegal,Iraq,,2026-06-26,0.6677,0.208749,0.123551,1.41,4.51,7.62,
-betexplorer,uruguay_vs_spain,Uruguay,Spain,,2026-06-27,0.182016,0.24067,0.577314,5.17,3.91,1.63,
-betexplorer,cape_verde_vs_saudi_arabia,Cape Verde,Saudi Arabia,,2026-06-27,0.371422,0.285622,0.342955,2.53,3.29,2.74,
-betexplorer,new_zealand_vs_belgium,New Zealand,Belgium,,2026-06-27,0.095882,0.166275,0.737843,9.85,5.68,1.28,
-betexplorer,egypt_vs_iran,Egypt,Iran,,2026-06-27,0.419565,0.316439,0.263996,2.24,2.97,3.56,
-betexplorer,panama_vs_england,Panama,England,,2026-06-27,0.102209,0.156777,0.741014,9.28,6.05,1.28,
-betexplorer,croatia_vs_ghana,Croatia,Ghana,,2026-06-27,0.574754,0.250691,0.174555,1.64,3.76,5.4,
-betexplorer,colombia_vs_portugal,Colombia,Portugal,,2026-06-27,0.270415,0.287781,0.441804,3.48,3.27,2.13,
-betexplorer,democratic_republic_of_the_congo_vs_uzbekistan,Democratic Republic of the Congo,Uzbekistan,,2026-06-27,0.407348,0.285144,0.307508,2.31,3.3,3.06,
-betexplorer,jordan_vs_argentina,Jordan,Argentina,,2026-06-28,0.068484,0.13618,0.795336,13.82,6.95,1.19,
-betexplorer,algeria_vs_austria,Algeria,Austria,,2026-06-28,0.258328,0.305145,0.436527,3.65,3.09,2.16,
 uanalyse,mexico_vs_south_africa,Mexico,South Africa,,2026-06-11,0.641,0.2145,0.1445,,,,"{""snapshot"": ""2026-06-11"", ""stage"": ""Group stage"", ""xhg"": ""1.897"", ""xag"": ""0.76""}"
 uanalyse,south_korea_vs_czech_republic,South Korea,Czech Republic,,2026-06-12,0.427,0.2615,0.3116,,,,"{""snapshot"": ""2026-06-11"", ""stage"": ""Group stage"", ""xhg"": ""1.476"", ""xag"": ""1.016""}"
 uanalyse,canada_vs_bosnia_and_herzegovina,Canada,Bosnia and Herzegovina,,2026-06-12,0.6356,0.2168,0.1475,,,,"{""snapshot"": ""2026-06-11"", ""stage"": ""Group stage"", ""xhg"": ""1.896"", ""xag"": ""0.832""}"
@@ -293,38 +221,38 @@ openfootball,england_vs_ghana,England,Ghana,L,2026-06-23,,,,,,,"{""round"": ""Ma
 openfootball,panama_vs_croatia,Panama,Croatia,L,2026-06-23,,,,,,,"{""round"": ""Matchday 13"", ""time"": ""19:00 UTC-4"", ""ground"": ""Toronto""}"
 openfootball,panama_vs_england,Panama,England,L,2026-06-27,,,,,,,"{""round"": ""Matchday 17"", ""time"": ""17:00 UTC-4"", ""ground"": ""New York/New Jersey (East Rutherford)""}"
 openfootball,croatia_vs_ghana,Croatia,Ghana,L,2026-06-27,,,,,,,"{""round"": ""Matchday 17"", ""time"": ""17:00 UTC-4"", ""ground"": ""Philadelphia""}"
-openfootball,2a_vs_2b,2A,2B,,2026-06-28,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-7"", ""ground"": ""Los Angeles (Inglewood)""}"
-openfootball,1e_vs_3a_b_c_d_f,1E,3A/B/C/D/F,,2026-06-29,,,,,,,"{""round"": ""Round of 32"", ""time"": ""16:30 UTC-4"", ""ground"": ""Boston (Foxborough)""}"
-openfootball,1f_vs_2c,1F,2C,,2026-06-29,,,,,,,"{""round"": ""Round of 32"", ""time"": ""19:00 UTC-6"", ""ground"": ""Monterrey (Guadalupe)""}"
-openfootball,1c_vs_2f,1C,2F,,2026-06-29,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-5"", ""ground"": ""Houston""}"
-openfootball,1i_vs_3c_d_f_g_h,1I,3C/D/F/G/H,,2026-06-30,,,,,,,"{""round"": ""Round of 32"", ""time"": ""17:00 UTC-4"", ""ground"": ""New York/New Jersey (East Rutherford)""}"
-openfootball,2e_vs_2i,2E,2I,,2026-06-30,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
-openfootball,1a_vs_3c_e_f_h_i,1A,3C/E/F/H/I,,2026-06-30,,,,,,,"{""round"": ""Round of 32"", ""time"": ""19:00 UTC-6"", ""ground"": ""Mexico City""}"
-openfootball,1l_vs_3e_h_i_j_k,1L,3E/H/I/J/K,,2026-07-01,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-4"", ""ground"": ""Atlanta""}"
-openfootball,1d_vs_3b_e_f_i_j,1D,3B/E/F/I/J,,2026-07-01,,,,,,,"{""round"": ""Round of 32"", ""time"": ""17:00 UTC-7"", ""ground"": ""San Francisco Bay Area (Santa Clara)""}"
-openfootball,1g_vs_3a_e_h_i_j,1G,3A/E/H/I/J,,2026-07-01,,,,,,,"{""round"": ""Round of 32"", ""time"": ""13:00 UTC-7"", ""ground"": ""Seattle""}"
-openfootball,2k_vs_2l,2K,2L,,2026-07-02,,,,,,,"{""round"": ""Round of 32"", ""time"": ""19:00 UTC-4"", ""ground"": ""Toronto""}"
-openfootball,1h_vs_2j,1H,2J,,2026-07-02,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-7"", ""ground"": ""Los Angeles (Inglewood)""}"
-openfootball,1b_vs_3e_f_g_i_j,1B,3E/F/G/I/J,,2026-07-02,,,,,,,"{""round"": ""Round of 32"", ""time"": ""20:00 UTC-7"", ""ground"": ""Vancouver""}"
-openfootball,1j_vs_2h,1J,2H,,2026-07-03,,,,,,,"{""round"": ""Round of 32"", ""time"": ""18:00 UTC-4"", ""ground"": ""Miami (Miami Gardens)""}"
-openfootball,1k_vs_3d_e_i_j_l,1K,3D/E/I/J/L,,2026-07-03,,,,,,,"{""round"": ""Round of 32"", ""time"": ""20:30 UTC-5"", ""ground"": ""Kansas City""}"
-openfootball,2d_vs_2g,2D,2G,,2026-07-03,,,,,,,"{""round"": ""Round of 32"", ""time"": ""13:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
-openfootball,w74_vs_w77,W74,W77,,2026-07-04,,,,,,,"{""round"": ""Round of 16"", ""time"": ""17:00 UTC-4"", ""ground"": ""Philadelphia""}"
-openfootball,w73_vs_w75,W73,W75,,2026-07-04,,,,,,,"{""round"": ""Round of 16"", ""time"": ""12:00 UTC-5"", ""ground"": ""Houston""}"
-openfootball,w76_vs_w78,W76,W78,,2026-07-05,,,,,,,"{""round"": ""Round of 16"", ""time"": ""16:00 UTC-4"", ""ground"": ""New York/New Jersey (East Rutherford)""}"
-openfootball,w79_vs_w80,W79,W80,,2026-07-05,,,,,,,"{""round"": ""Round of 16"", ""time"": ""18:00 UTC-6"", ""ground"": ""Mexico City""}"
-openfootball,w83_vs_w84,W83,W84,,2026-07-06,,,,,,,"{""round"": ""Round of 16"", ""time"": ""14:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
-openfootball,w81_vs_w82,W81,W82,,2026-07-06,,,,,,,"{""round"": ""Round of 16"", ""time"": ""17:00 UTC-7"", ""ground"": ""Seattle""}"
-openfootball,w86_vs_w88,W86,W88,,2026-07-07,,,,,,,"{""round"": ""Round of 16"", ""time"": ""12:00 UTC-4"", ""ground"": ""Atlanta""}"
-openfootball,w85_vs_w87,W85,W87,,2026-07-07,,,,,,,"{""round"": ""Round of 16"", ""time"": ""13:00 UTC-7"", ""ground"": ""Vancouver""}"
-openfootball,w89_vs_w90,W89,W90,,2026-07-09,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""16:00 UTC-4"", ""ground"": ""Boston (Foxborough)""}"
-openfootball,w93_vs_w94,W93,W94,,2026-07-10,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""12:00 UTC-7"", ""ground"": ""Los Angeles (Inglewood)""}"
-openfootball,w91_vs_w92,W91,W92,,2026-07-11,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""17:00 UTC-4"", ""ground"": ""Miami (Miami Gardens)""}"
-openfootball,w95_vs_w96,W95,W96,,2026-07-11,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""20:00 UTC-5"", ""ground"": ""Kansas City""}"
-openfootball,w97_vs_w98,W97,W98,,2026-07-14,,,,,,,"{""round"": ""Semi-final"", ""time"": ""14:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
-openfootball,w99_vs_w100,W99,W100,,2026-07-15,,,,,,,"{""round"": ""Semi-final"", ""time"": ""15:00 UTC-4"", ""ground"": ""Atlanta""}"
-openfootball,l101_vs_l102,L101,L102,,2026-07-18,,,,,,,"{""round"": ""Match for third place"", ""time"": ""17:00 UTC-4"", ""ground"": ""Miami (Miami Gardens)""}"
-openfootball,w101_vs_w102,W101,W102,,2026-07-19,,,,,,,"{""round"": ""Final"", ""time"": ""15:00 UTC-4"", ""ground"": ""New York/New Jersey (East Rutherford)""}"
+openfootball,south_africa_vs_canada,South Africa,Canada,,2026-06-28,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-7"", ""ground"": ""Los Angeles (Inglewood)""}"
+openfootball,germany_vs_paraguay,Germany,Paraguay,,2026-06-29,,,,,,,"{""round"": ""Round of 32"", ""time"": ""16:30 UTC-4"", ""ground"": ""Boston (Foxborough)""}"
+openfootball,netherlands_vs_morocco,Netherlands,Morocco,,2026-06-29,,,,,,,"{""round"": ""Round of 32"", ""time"": ""19:00 UTC-6"", ""ground"": ""Monterrey (Guadalupe)""}"
+openfootball,brazil_vs_japan,Brazil,Japan,,2026-06-29,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-5"", ""ground"": ""Houston""}"
+openfootball,france_vs_sweden,France,Sweden,,2026-06-30,,,,,,,"{""round"": ""Round of 32"", ""time"": ""17:00 UTC-4"", ""ground"": ""New York/New Jersey (East Rutherford)""}"
+openfootball,ivory_coast_vs_norway,Ivory Coast,Norway,,2026-06-30,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
+openfootball,mexico_vs_ecuador,Mexico,Ecuador,,2026-06-30,,,,,,,"{""round"": ""Round of 32"", ""time"": ""19:00 UTC-6"", ""ground"": ""Mexico City""}"
+openfootball,england_vs_dr_congo,England,DR Congo,,2026-07-01,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-4"", ""ground"": ""Atlanta""}"
+openfootball,usa_vs_bosnia_herzegovina,USA,Bosnia & Herzegovina,,2026-07-01,,,,,,,"{""round"": ""Round of 32"", ""time"": ""17:00 UTC-7"", ""ground"": ""San Francisco Bay Area (Santa Clara)""}"
+openfootball,belgium_vs_senegal,Belgium,Senegal,,2026-07-01,,,,,,,"{""round"": ""Round of 32"", ""time"": ""13:00 UTC-7"", ""ground"": ""Seattle""}"
+openfootball,portugal_vs_croatia,Portugal,Croatia,,2026-07-02,,,,,,,"{""round"": ""Round of 32"", ""time"": ""19:00 UTC-4"", ""ground"": ""Toronto""}"
+openfootball,spain_vs_austria,Spain,Austria,,2026-07-02,,,,,,,"{""round"": ""Round of 32"", ""time"": ""12:00 UTC-7"", ""ground"": ""Los Angeles (Inglewood)""}"
+openfootball,switzerland_vs_algeria,Switzerland,Algeria,,2026-07-02,,,,,,,"{""round"": ""Round of 32"", ""time"": ""20:00 UTC-7"", ""ground"": ""Vancouver""}"
+openfootball,argentina_vs_cape_verde,Argentina,Cape Verde,,2026-07-03,,,,,,,"{""round"": ""Round of 32"", ""time"": ""18:00 UTC-4"", ""ground"": ""Miami (Miami Gardens)""}"
+openfootball,colombia_vs_ghana,Colombia,Ghana,,2026-07-03,,,,,,,"{""round"": ""Round of 32"", ""time"": ""20:30 UTC-5"", ""ground"": ""Kansas City""}"
+openfootball,australia_vs_egypt,Australia,Egypt,,2026-07-03,,,,,,,"{""round"": ""Round of 32"", ""time"": ""13:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
+openfootball,paraguay_vs_france,Paraguay,France,,2026-07-04,,,,,,,"{""round"": ""Round of 16"", ""time"": ""17:00 UTC-4"", ""ground"": ""Philadelphia""}"
+openfootball,canada_vs_morocco,Canada,Morocco,,2026-07-04,,,,,,,"{""round"": ""Round of 16"", ""time"": ""12:00 UTC-5"", ""ground"": ""Houston""}"
+openfootball,brazil_vs_norway,Brazil,Norway,,2026-07-05,,,,,,,"{""round"": ""Round of 16"", ""time"": ""16:00 UTC-4"", ""ground"": ""New York/New Jersey (East Rutherford)""}"
+openfootball,mexico_vs_england,Mexico,England,,2026-07-05,,,,,,,"{""round"": ""Round of 16"", ""time"": ""18:00 UTC-6"", ""ground"": ""Mexico City""}"
+openfootball,portugal_vs_spain,Portugal,Spain,,2026-07-06,,,,,,,"{""round"": ""Round of 16"", ""time"": ""14:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
+openfootball,usa_vs_belgium,USA,Belgium,,2026-07-06,,,,,,,"{""round"": ""Round of 16"", ""time"": ""17:00 UTC-7"", ""ground"": ""Seattle""}"
+openfootball,argentina_vs_egypt,Argentina,Egypt,,2026-07-07,,,,,,,"{""round"": ""Round of 16"", ""time"": ""12:00 UTC-4"", ""ground"": ""Atlanta""}"
+openfootball,switzerland_vs_colombia,Switzerland,Colombia,,2026-07-07,,,,,,,"{""round"": ""Round of 16"", ""time"": ""13:00 UTC-7"", ""ground"": ""Vancouver""}"
+openfootball,france_vs_morocco,France,Morocco,,2026-07-09,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""16:00 UTC-4"", ""ground"": ""Boston (Foxborough)""}"
+openfootball,spain_vs_belgium,Spain,Belgium,,2026-07-10,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""12:00 UTC-7"", ""ground"": ""Los Angeles (Inglewood)""}"
+openfootball,norway_vs_england,Norway,England,,2026-07-11,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""17:00 UTC-4"", ""ground"": ""Miami (Miami Gardens)""}"
+openfootball,argentina_vs_switzerland,Argentina,Switzerland,,2026-07-11,,,,,,,"{""round"": ""Quarter-final"", ""time"": ""20:00 UTC-5"", ""ground"": ""Kansas City""}"
+openfootball,france_vs_spain,France,Spain,,2026-07-14,,,,,,,"{""round"": ""Semi-final"", ""time"": ""14:00 UTC-5"", ""ground"": ""Dallas (Arlington)""}"
+openfootball,england_vs_argentina,England,Argentina,,2026-07-15,,,,,,,"{""round"": ""Semi-final"", ""time"": ""15:00 UTC-4"", ""ground"": ""Atlanta""}"
+openfootball,france_vs_england,France,England,,2026-07-18,,,,,,,"{""round"": ""Match for third place"", ""time"": ""17:00 UTC-4"", ""ground"": ""Miami (Miami Gardens)""}"
+openfootball,spain_vs_argentina,Spain,Argentina,,2026-07-19,,,,,,,"{""round"": ""Final"", ""time"": ""15:00 UTC-4"", ""ground"": ""New York/New Jersey (East Rutherford)""}"
 oddsharvester,mexico_vs_south_africa,Mexico,South Africa,,2026-06-11,0.673535,0.212457,0.114008,1.41,4.47,8.33,"{""n_bookies"": 3, ""bookmakers"": [""bet365.us"", ""BetMGM.us"", ""DraftKings""], ""url"": ""https://www.oddsportal.com/football/h2h/mexico-O6iHcNkd/south-africa-W2ijYvlr/#h4EoUB7T"", ""venue"": ""Estadio Banorte""}"
 oddsharvester,south_korea_vs_czech_republic,South Korea,Czech Republic,,2026-06-11,0.359906,0.313581,0.326513,2.64,3.03,2.91,"{""n_bookies"": 3, ""bookmakers"": [""bet365.us"", ""BetMGM.us"", ""DraftKings""], ""url"": ""https://www.oddsportal.com/football/h2h/czech-republic-6LHwBDGU/south-korea-K6Gs7P6G/#CGdvIm6K"", ""venue"": ""Estadio Akron""}"
 oddsharvester,canada_vs_bosnia_herzegovina,Canada,Bosnia & Herzegovina,,2026-06-12,0.520133,0.26666,0.213208,1.82,3.55,4.44,"{""n_bookies"": 3, ""bookmakers"": [""bet365.us"", ""BetMGM.us"", ""DraftKings""], ""url"": ""https://www.oddsportal.com/football/h2h/bosnia-herzegovina-fqe7WYTr/canada-x4toKORL/#OxkQ8qT6"", ""venue"": ""BMO Field""}"

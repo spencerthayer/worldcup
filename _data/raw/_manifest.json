@@ -1,65 +1,58 @@
 [
   {
-    "source": "openfootball",
-    "file": "_data/raw/openfootball/worldcup-2026.json",
-    "size_bytes": 19957,
-    "timestamp": "2026-06-11T16:43:30.995437+00:00",
-    "status": 200
+    "source": "betexplorer",
+    "file": "_data/raw/betexplorer/world-cup-calendar.ics",
+    "size_bytes": 335340,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:01.769588"
   },
   {
     "source": "polymarket",
-    "file": "_data/raw/polymarket/gamma-events.json",
-    "size_bytes": 10070408,
-    "timestamp": "2026-06-11T16:43:31.520170+00:00",
-    "status": 200
+    "file": "_data/raw/polymarket/events_worldcup.json",
+    "size_bytes": 12395388,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:07.210063"
   },
   {
-    "source": "uanalyse",
-    "file": "_data/raw/uanalyse/latest/match_predictions.csv",
-    "size_bytes": 6904,
-    "timestamp": "2026-06-11T16:43:31.549941+00:00",
-    "status": 200
+    "source": "polymarket",
+    "file": "_data/raw/polymarket/markets_worldcup.json",
+    "size_bytes": 777052,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:07.795505"
   },
   {
-    "source": "uanalyse",
-    "file": "_data/raw/uanalyse/latest/tournament_probabilities.csv",
-    "size_bytes": 3809,
-    "timestamp": "2026-06-11T16:43:31.582122+00:00",
-    "status": 200
-  },
-  {
-    "source": "worldcup-predictor",
-    "file": "_data/raw/worldcup-predictor/wc2026_predictions.csv",
-    "size_bytes": 9239,
-    "timestamp": "2026-06-11T16:43:31.626414+00:00",
-    "status": 200
-  },
-  {
-    "source": "hicruben",
-    "file": "_data/raw/hicruben/results.json",
-    "size_bytes": 313167,
-    "timestamp": "2026-06-11T16:43:31.683762+00:00",
-    "status": 200
-  },
-  {
-    "source": "hicruben",
-    "file": "_data/raw/hicruben/elo-calibrated.json",
-    "size_bytes": 1227,
-    "timestamp": "2026-06-11T16:43:31.718595+00:00",
-    "status": 200
-  },
-  {
-    "source": "hicruben",
-    "file": "_data/raw/hicruben/model-backtest.json",
-    "size_bytes": 666,
-    "timestamp": "2026-06-11T16:43:31.753574+00:00",
-    "status": 200
+    "source": "openfootball",
+    "file": "_data/raw/openfootball/worldcup-2026.json",
+    "size_bytes": 42015,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:08.405369"
   },
   {
     "source": "fivethirtyeight",
-    "file": "_data/raw/fivethirtyeight/wc-2014-final-predictions.csv",
-    "size_bytes": 4638,
-    "timestamp": "2026-06-11T16:43:31.919426+00:00",
-    "status": 200
+    "file": "_data/raw/fivethirtyeight/README.md",
+    "size_bytes": 1411,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:12.001538"
+  },
+  {
+    "source": "natesilver",
+    "file": "_data/raw/natesilver/world-cup-2026-predictions.html",
+    "size_bytes": 201111,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:13.462588"
+  },
+  {
+    "source": "covers",
+    "file": "_data/raw/covers/odds.html",
+    "size_bytes": 437374,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:13.682450"
+  },
+  {
+    "source": "oddsportal",
+    "file": "_data/raw/oddsportal/world-championship-2026.html",
+    "size_bytes": 186576,
+    "status": 200,
+    "timestamp": "2026-07-15T21:26:17.760407"
   }
 ]

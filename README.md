@@ -11,13 +11,15 @@ See the [results](results.md).
 |---|---|
 | `generate_bracket.py` | **Main bracket generator** — Monte Carlo simulation + optimization |
 | `generate_results.py` | **Results tracker** — compares predictions vs actual results, tracks score |
-| `update_results.py` | **Match result updater** — CLI for entering actual match scores |
-| `normalize_data.py` | Normalizes raw odds from all sources into a common schema |
-| `parse_calendar.py` | Legacy script — downloads ICS calendar, simple expected-points model |
-| `download_data.py` | Downloads raw data from all sources into `_data/raw/` |
-| `scrape_all.py` | Scrapes OddsPortal via OddsHarvester + Playwright for other sources |
+| `update_results.py` | **Match result updater** — CLI for entering actual match scores; auto-resolves bracket match numbers |
+| `sync_results_from_ics.py` | Syncs results from BetExplorer ICS calendar |
+| `scripts/download_data.py` | Downloads raw data from all sources into `_data/raw/` |
+| `scripts/download_github_data.py` | Downloads data from GitHub-hosted sources |
+| `scripts/normalize_data.py` | Normalizes raw odds from all sources into a common schema |
+| `scripts/parse_calendar.py` | Legacy script — downloads ICS calendar, simple expected-points model |
+| `scripts/scrape_all.py` | Scrapes OddsPortal via OddsHarvester + Playwright for other sources |
 | `_data/raw/` | Raw data from 8+ sources (JSON, CSV, HTML, ICS) |
-| `_data/norm/all_odds_normalized.csv` | Normalized consensus odds (398 rows, 6 sources) |
+| `_data/norm/all_odds_normalized.csv` | Normalized consensus odds (396 rows, 6 sources) |
 | `_data/bracket.json` | Full machine-readable bracket output |
 | `_data/results.json` | Actual match results (updated via update_results.py) |
 | `results.md` | Visual human-readable results with flags, scoring, and accuracy |
@@ -27,16 +29,16 @@ See the [results](results.md).
 
 ```
 ┌─────────────────┐     ┌──────────────┐     ┌───────────────┐     ┌──────────────┐
-│  Scrape / fetch  │────▶│  _data/raw/  │────▶│  normalize_   │────▶│ _data/norm/  │
-│  odds from 8+    │     │  per-source  │     │  data.py      │     │ all_odds_    │
-│  open sources    │     │  raw files   │     │               │     │ normalized   │
+│  Scrape / fetch  │────▶│  _data/raw/  │────▶│  scripts/      │────▶│ _data/norm/  │
+│  odds from 8+    │     │  per-source  │     │  normalize_    │     │ all_odds_    │
+│  open sources    │     │  raw files   │     │  data.py       │     │ normalized   │
 └─────────────────┘     └──────────────┘     └───────────────┘     └──────┬───────┘
-                                                                         │
-                                                                         ▼
+                                                                          │
+                                                                          ▼
 ┌─────────────────┐     ┌──────────────┐     ┌───────────────┐     ┌──────────────┐
 │  _data/bracket   │◀────│  Optimize    │◀────│  Monte Carlo  │◀────│  Consensus   │
 │  .json/.csv/.md  │     │  bracket     │     │  simulation   │     │  probability │
-│                  │     │  picks       │     │  (50K iters)  │     │  model       │
+│                  │     │  picks       │     │  (1M iters)   │     │  model       │
 └─────────────────┘     └──────────────┘     └───────────────┘     └──────────────┘
 ```
 
@@ -48,8 +50,8 @@ pip install playwright
 python3 -m playwright install chromium
 
 # 2. Download and normalize all data
-python3 download_data.py
-python3 normalize_data.py
+python3 scripts/download_data.py
+python3 scripts/normalize_data.py
 
 # 3. Generate the bracket (1M simulations, ~6 minutes)
 python3 generate_bracket.py --sims 1000000 --seed 42
@@ -96,7 +98,7 @@ Data is collected from 8+ open sources using a combination of direct HTTP, the O
 
 ### Step 2: Normalize
 
-`normalize_data.py` canonicalizes team names (70+ aliases), converts all sources to a common schema, and computes implied probabilities from decimal odds:
+`scripts/normalize_data.py` canonicalizes team names (70+ aliases), converts all sources to a common schema, and computes implied probabilities from decimal odds:
 
 ```
 source, match_id, home_team, away_team, group, date,
@@ -104,7 +106,7 @@ home_win_prob, draw_prob, away_win_prob,
 home_win_odds, draw_odds, away_win_odds, extra
 ```
 
-The normalized file has 398 rows across 6 sources covering 119 unique matches.
+The normalized file has 396 rows across 6 sources covering 186 unique matches.
 
 ---
 
@@ -192,36 +194,35 @@ $$\text{SE}(\hat{P}) \leq \sqrt{\frac{0.25}{N}}$$
 | 1,000,000 | 0.0005 | ±0.05% |
 
 At 50K sims, the ±0.22% noise is small enough that most bracket picks are stable, but near-ties (e.g., Spain 16.8% vs Argentina 15.1%) can flip between runs. At 1M sims, the ±0.05% noise resolves gaps as small as 0.1% — the champion flipped from Argentina (50K) to Spain (1M) as the 1.7% gap became unambiguous. Beyond ~50K sims, gains diminish: the input probabilities themselves (consensus model ±2-5% per match) become the dominant source of error rather than simulation noise.
+
 ### Bracket optimization
 
-The bracket must maximize expected challenge points, not simply pick the most likely winner of every game. The scoring system (341 points total):
+The bracket must maximize expected challenge points, not simply pick the most likely winner of every game. The scoring system (203 points total):
 
 | Stage | Picks | Points each | Max |
 |---|---:|---:|---:|
 | Group placement (exact ordered slots) | 48 | 1 | 48 |
-| Team advances from group | 32 | 1 | 32 |
-| Round of 32 | 32 | 2 | 64 |
-| Round of 16 | 16 | 4 | 64 |
-| Quarterfinal | 8 | 6 | 48 |
-| Semifinal | 4 | 10 | 40 |
-| Final | 2 | 15 | 30 |
+| Advance to Knockout (which teams qualify) | 32 | 1 | 32 |
+| Advance to Round of 32 (R32 match winners) | 16 | 2 | 32 |
+| Advance to Quarterfinal (R16 match winners) | 8 | 4 | 32 |
+| Advance to Semifinal (QF match winners) | 4 | 6 | 24 |
+| Finalist (SF match winners) | 2 | 10 | 20 |
 | Champion | 1 | 15 | 15 |
 
 The expected score for a bracket $B$ is:
 
 $$E[\text{score}(B)] = \sum_{\text{groups } g} \sum_{\text{positions } r} P(B[g,r] \text{ finishes } r) \cdot 1$$
 $$+ \sum_{t \in B_{\text{adv}}} 1 \cdot P(t \text{ advances from group})$$
-$$+ \sum_{t \in B_{\text{R32}}} 2 \cdot P(t \text{ reaches R32})$$
-$$+ \sum_{t \in B_{\text{R16}}} 4 \cdot P(t \text{ reaches R16})$$
-$$+ \sum_{t \in B_{\text{QF}}} 6 \cdot P(t \text{ reaches QF})$$
-$$+ \sum_{t \in B_{\text{SF}}} 10 \cdot P(t \text{ reaches SF})$$
-$$+ \sum_{t \in B_{\text{F}}} 15 \cdot P(t \text{ reaches Final})$$
+$$+ \sum_{t \in B_{\text{R16}}} 2 \cdot P(t \text{ reaches R16})$$
+$$+ \sum_{t \in B_{\text{QF}}} 4 \cdot P(t \text{ reaches QF})$$
+$$+ \sum_{t \in B_{\text{SF}}} 6 \cdot P(t \text{ reaches SF})$$
+$$+ \sum_{t \in B_{\text{F}}} 10 \cdot P(t \text{ reaches Final})$$
 $$+ 15 \cdot P(B_{\text{winner}} \text{ wins tournament})$$
 
 
 ## How the expected score is computed
 
-The **expected score** (e.g. **157.41 / 341**) is the probability-weighted sum of every pick in the bracket. For each pick, multiply the probability that the pick is correct by the points it would earn, then sum over all picks.
+The **expected score** (e.g. **97.53 / 203**) is the probability-weighted sum of every pick in the bracket. For each pick, multiply the probability that the pick is correct by the points it would earn, then sum over all picks.
 
 ### The formula
 
@@ -233,11 +234,11 @@ The total expected score sums this over every stage:
 
     E[score] = sum_group_picks P(correct) x 1
              + sum_group_adv_picks P(advances) x 1
-             + sum_R32_picks P(advances) x 2
-             + sum_R16_picks P(advances) x 4
-             + sum_QF_picks P(advances) x 6
-             + sum_SF_picks P(advances) x 10
-             + sum_F_picks P(advances) x 15
+             + sum_R32_winners P(advances) x 2
+             + sum_R16_winners P(advances) x 4
+             + sum_QF_winners P(advances) x 6
+             + sum_SF_winners P(advances) x 10
+             + sum_finalists P(advances) x 10
              + P(champion wins) x 15
 
 ### Concrete examples from the current bracket
@@ -252,31 +253,30 @@ South Korea is predicted 2nd but only finishes 2nd in 26.2% of simulations:
 
 Across all 48 group placement picks, this sums to roughly 23 expected points (out of 48 max). You do not expect to get all 48 right -- even the best model has uncertainty.
 
-**Advance to Round of 32 (2 pts each):** Spain reaches the knockout in 98.3% of simulations:
+**Advance to Round of 32 (2 pts each):** Spain reaches the Round of 16 in 98.3% of simulations:
 
-    E[Spain in R32] = 0.983 x 2 = 1.966 expected points
+    E[Spain in R16] = 0.983 x 2 = 1.966 expected points
 
 **Champion (15 pts):** Spain is the predicted champion, winning in 16.9% of simulations:
 
     E[champion] = 0.169 x 15 = 2.54 expected points
 
-### Why 157.41 and not 341?
+### Why 97.53 and not 203?
 
-341 is the perfect score. 157.41 is what you would win on average if you could play this bracket millions of times. The gap reflects genuine uncertainty:
+203 is the perfect score. 97.53 is what you would win on average if you could play this bracket millions of times. The gap reflects genuine uncertainty:
 
 | Stage | Max | Expected | Why the gap |
 |---|---:|---:|---|
 | Group Placement | 48 | ~23 | Hard to predict exact 1st/2nd/3rd/4th |
-| Group Advancement | 32 | ~27 | Easier to predict who qualifies |
-| Round of 32 | 64 | ~52 | Competitive matches, upsets |
-| Round of 16 | 64 | ~48 | Only 16 of 32 teams advance |
-| Quarterfinal | 48 | ~30 | Only 8 of 16 teams survive |
-| Semifinal | 40 | ~30 | Deep uncertainty |
-| Final | 30 | ~15 | Very hard to predict finalists |
+| Advance to Knockout | 32 | ~27 | Easier to predict who qualifies |
+| Advance to R16 | 32 | ~15 | Competitive knockout matches, upsets |
+| Advance to QF | 32 | ~12 | Only 8 of 16 teams survive |
+| Advance to SF | 24 | ~9 | Deep uncertainty |
+| Finalist | 20 | ~6 | Very hard to predict finalists |
 | Champion | 15 | ~2.5 | 83% chance the pick is wrong |
-| **Total** | **341** | **~157.41** | |
+| **Total** | **203** | **~97.53** | |
 
-Even picking the champion (16.9% probability) only contributes 2.54 expected points because there is an 83.1% chance that pick is wrong. The model is well-calibrated: over many brackets, it would average 157.41 points per bracket.
+Even picking the champion (16.9% probability) only contributes 2.54 expected points because there is an 83.1% chance that pick is wrong. The model is well-calibrated: over many brackets, it would average 97.53 points per bracket.
 
 
 **Group placements** are optimized by brute force over all $4! = 24$ permutations per group, picking the ordering that maximizes expected placement points.
@@ -390,6 +390,8 @@ python3 update_results.py -m Mexico_vs_South_Africa -s 2 1
 python3 generate_results.py
 ```
 
+`update_results.py` automatically resolves the bracket `match_num` and `round` for knockout matches using the bracket topology, so results are correctly placed in the Mermaid bracket chart without manual JSON edits.
+
 ### Partial group handling
 
 Groups are updated **one match at a time** as results come in. You do not need to wait for all 6 matches in a group to be played:
@@ -424,10 +426,10 @@ Points are only earned when a pick is **fully resolved**:
 |---|---:|---|
 | Group Placement | +1 per correct position | Only when ALL 6 group matches are played |
 | Advance to Knockout | +1 per correct team | Only when ALL groups are complete |
-| Advance to R16 | +2 per correct team | When R16 matches are played |
-| Advance to QF | +4 per correct team | When QF matches are played |
-| Advance to SF | +6 per correct team | When SF matches are played |
-| Finalist | +10 per correct team | When Final is played |
+| Advance to R16 | +2 per correct team | When R32 matches are played |
+| Advance to QF | +4 per correct team | When R16 matches are played |
+| Advance to SF | +6 per correct team | When QF matches are played |
+| Finalist | +10 per correct team | When SF matches are played |
 | Winner | +15 | When Champion is determined |
 
 Until a stage is resolved, its picks show as **pending** and contribute 0 to the actual score.
@@ -435,8 +437,8 @@ Until a stage is resolved, its picks show as **pending** and contribute 0 to the
 ### Expected vs Actual score
 
 - **Expected Score** (e.g. 97.53 / 203): Computed at bracket-generation time. Sum of `P(correct) × points` for all 111 picks. This is the model's ex-ante estimate and does not change as matches are played.
-- **Actual Score** (e.g. 1 / 203): Points earned from correct predictions against real results. Starts at 0 and increases as matches are played. Maximum is 203 (perfect bracket).
-- **Accuracy**: Fraction of resolved predictions that were correct (e.g. 1/4 = 25%).
+- **Actual Score** (e.g. 143 / 203): Points earned from correct predictions against real results. Starts at 0 and increases as matches are played. Maximum is 203 (perfect bracket).
+- **Accuracy**: Fraction of resolved predictions that were correct (e.g. 83/110 = 75.5%).
 
 ### Data files
 

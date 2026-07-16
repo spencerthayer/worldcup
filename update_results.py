@@ -20,6 +20,66 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+# FIFA 2026 bracket topology: child match_num -> (parent_a, parent_b).
+BRACKET_CHILDREN = {
+    89: (74, 77), 90: (73, 75), 91: (76, 78), 92: (79, 80),
+    93: (83, 84), 94: (81, 82), 95: (86, 88), 96: (85, 87),
+    97: (89, 90), 98: (93, 94), 99: (91, 92), 100: (95, 96),
+    101: (97, 98), 102: (99, 100), 104: (101, 102),
+}
+
+ROUND_BY_NUM = {}
+for mn in range(73, 89):
+    ROUND_BY_NUM[mn] = "round_of_32"
+for mn in range(89, 97):
+    ROUND_BY_NUM[mn] = "round_of_16"
+for mn in range(97, 101):
+    ROUND_BY_NUM[mn] = "quarter_finals"
+for mn in (101, 102):
+    ROUND_BY_NUM[mn] = "semi_finals"
+ROUND_BY_NUM[104] = "final"
+
+
+def _nteam(team):
+    return team.replace(" ", "_").replace("&", "and")
+
+
+def resolve_knockout_match_num(ko_matches, team1, team2):
+    """Determine the match_num for a knockout match from the bracket topology.
+
+    Walks the bracket tree: R32 matches are keyed by team names already in
+    ko_matches.  Higher rounds are resolved by checking which two parent
+    matches' winners would face each other.
+    """
+    t1n = _nteam(team1)
+    t2n = _nteam(team2)
+
+    # Build team -> match_num from already-recorded R32 results.
+    team_to_r32 = {}
+    for key, m in ko_matches.items():
+        if m.get("round") == "round_of_32" and m.get("match_num"):
+            mn = m["match_num"]
+            w = m.get("winner")
+            if w:
+                team_to_r32[_nteam(w)] = mn
+
+    # For each unmatched bracket child, check if both parent winners are known
+    # and match the team pair we're looking for.
+    for child_mn, (pa, pb) in BRACKET_CHILDREN.items():
+        w_a = None
+        w_b = None
+        for key, m in ko_matches.items():
+            if m.get("match_num") == pa:
+                w_a = _nteam(m.get("winner", ""))
+            if m.get("match_num") == pb:
+                w_b = _nteam(m.get("winner", ""))
+        if w_a and w_b:
+            if (t1n == w_a and t2n == w_b) or (t1n == w_b and t2n == w_a):
+                return child_mn
+
+    return None
+
+
 def load_results(path):
     if Path(path).exists():
         with open(path) as f:
@@ -87,8 +147,17 @@ def main():
         else:
             if "knockout_matches" not in results:
                 results["knockout_matches"] = {}
+            match_num = resolve_knockout_match_num(
+                results.get("knockout_matches", {}), t1, t2
+            )
+            if match_num is not None:
+                entry["match_num"] = match_num
+                entry["round"] = ROUND_BY_NUM.get(match_num, "")
             results["knockout_matches"][args.match] = entry
-            print(f"✅ {t1} {s1}-{s2} {t2} → {winner}")
+            if match_num is not None:
+                print(f"✅ {t1} {s1}-{s2} {t2} → {winner}  (match #{match_num})")
+            else:
+                print(f"✅ {t1} {s1}-{s2} {t2} → {winner}")
 
         save_results(results, args.results)
 

@@ -958,9 +958,11 @@
       "score1": 1,
       "score2": 2,
       "winner": "Argentina",
-      "played": true
+      "played": true,
+      "match_num": 102,
+      "round": "semi_finals"
     }
   },
-  "last_updated": "2026-07-15T21:26:29.647437+00:00",
+  "last_updated": "2026-07-16T16:17:26.907330+00:00",
   "source": "kubeia ICS calendar"
 }

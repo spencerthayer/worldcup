@@ -1,6 +1,6 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-07-16T16:13:20.595255+00:00
+**Last updated:** 2026-07-16T16:17:33.317534+00:00
 
 ## 🎯 Summary
 
@@ -10,9 +10,9 @@
 
 ## 📈 Scoring Summary
 
-**Current Score: 123 / 203 (60.6%)**
+**Current Score: 143 / 203 (70.4%)**
 
-**Accuracy: 81/108 correct (75.0%)**
+**Accuracy: 83/110 correct (75.5%)**
 
 | Stage | Correct | Pts/Pick | Max | Pts Earned |
 |:---|:---:|:---:|:---:|:---:|
@@ -21,9 +21,9 @@
 | Advance to Round of 32 | 12/16 | 2 | 32 | **24** |
 | Advance to Quarterfinal | 5/8 | 4 | 32 | **20** |
 | Advance to Semifinal | 3/4 | 6 | 24 | **18** |
-| Finalist | 0/0 (+2 pending) | 10 | 20 | **0** |
+| Finalist | 2/2 | 10 | 20 | **20** |
 | Champion | 0/0 (+1 pending) | 15 | 15 | **0** |
-| **Total** | | | **203** | **123** |
+| **Total** | | | **203** | **143** |
 
 ## 🗺️ Bracket Progress vs Prediction
 
@@ -191,14 +191,14 @@ flowchart TB
     end
     subgraph sfPath102["SF 102 · W99 vs W100"]
       direction TB
-      m102["SF: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇦🇷 Argentina"]:::pending
+      m102["SF: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England 1-2 🇦🇷 Argentina → 🇦🇷 Argentina"]:::hit
     end
     sfPath101 --> sfPath102
   end
 
   subgraph sgFinalists["6. Finalists"]
     direction LR
-    m104["F: 🇪🇸 Spain vs 🏳️ W102"]:::pending
+    m104["F: 🇪🇸 Spain vs 🇦🇷 Argentina"]:::pending
   end
 
   subgraph sgWinner["7. Winner"]
@@ -221,7 +221,7 @@ flowchart TB
 | R16 | Argentina, Belgium, Brazil, Canada, Colombia, England, France, Mexico, Portugal, Spain, Switzerland, USA | Ecuador, Germany, Netherlands, Turkey |
 | QF | Argentina, Belgium, England, France, Spain | Brazil, Netherlands, Portugal |
 | SF | Argentina, France, Spain | Brazil |
-| Final | _pending_ | _pending_ |
+| Final | Argentina, Spain | — |
 | Champion | _pending_ | _pending_ |
 
 ## 📊 Group Placements

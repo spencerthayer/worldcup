@@ -1,6 +1,6 @@
 # 🏆 2026 World Cup Bracket Results
 
-**Last updated:** 2026-07-16T16:17:33.317534+00:00
+**Last updated:** 2026-07-23T21:52:41.238959+00:00
 
 ## 🎯 Summary
 
@@ -10,9 +10,9 @@
 
 ## 📈 Scoring Summary
 
-**Current Score: 143 / 203 (70.4%)**
+**Current Score: 158 / 203 (77.8%)**
 
-**Accuracy: 83/110 correct (75.5%)**
+**Accuracy: 84/111 correct (75.7%)**
 
 | Stage | Correct | Pts/Pick | Max | Pts Earned |
 |:---|:---:|:---:|:---:|:---:|
@@ -22,8 +22,8 @@
 | Advance to Quarterfinal | 5/8 | 4 | 32 | **20** |
 | Advance to Semifinal | 3/4 | 6 | 24 | **18** |
 | Finalist | 2/2 | 10 | 20 | **20** |
-| Champion | 0/0 (+1 pending) | 15 | 15 | **0** |
-| **Total** | | | **203** | **143** |
+| Champion | 1/1 | 15 | 15 | **15** |
+| **Total** | | | **203** | **158** |
 
 ## 🗺️ Bracket Progress vs Prediction
 
@@ -97,7 +97,7 @@ flowchart TB
     subgraph koPath98["QF 98"]
       direction TB
       m81["R32: 🇺🇸 USA 2-0 🇧🇦 Bosnia → 🇺🇸 USA"]:::hit
-      m82["R32: 🇧🇪 Belgium 2-2* 🇸🇳 Senegal → 🇧🇪 Belgium"]:::hit
+      m82["R32: 🇧🇪 Belgium 3-2* 🇸🇳 Senegal → 🇧🇪 Belgium"]:::hit
       m83["R32: 🇵🇹 Portugal 2-1 🇭🇷 Croatia → 🇵🇹 Portugal"]:::hit
       m84["R32: 🇪🇸 Spain 3-0 🇦🇹 Austria → 🇪🇸 Spain"]:::hit
       m81 --> m82
@@ -118,7 +118,7 @@ flowchart TB
       direction TB
       m85["R32: 🇨🇭 Swiss 2-0 🇩🇿 Algeria → 🇨🇭 Swiss"]:::hit
       m87["R32: 🇨🇴 Colombia 1-0 🇬🇭 Ghana → 🇨🇴 Colombia"]:::hit
-      m86["R32: 🇦🇷 Argentina 1-1* 🇨🇻 C. Verde → 🇦🇷 Argentina"]:::hit
+      m86["R32: 🇦🇷 Argentina 3-2* 🇨🇻 C. Verde → 🇦🇷 Argentina"]:::hit
       m88["R32: 🇦🇺 Australia 1-1* 🇪🇬 Egypt → 🇪🇬 Egypt"]:::miss
       m85 --> m87
       m87 --> m86
@@ -172,11 +172,11 @@ flowchart TB
     end
     subgraph qfPath99["QF 99"]
       direction TB
-      m99["QF: 🇳🇴 Norway 1-1* 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England → 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England"]:::miss
+      m99["QF: 🇳🇴 Norway 1-2* 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England → 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England"]:::miss
     end
     subgraph qfPath100["QF 100"]
       direction TB
-      m100["QF: 🇦🇷 Argentina 1-1* 🇨🇭 Swiss → 🇦🇷 Argentina"]:::hit
+      m100["QF: 🇦🇷 Argentina 3-1* 🇨🇭 Swiss → 🇦🇷 Argentina"]:::hit
     end
     qfPath97 --> qfPath98
     qfPath98 --> qfPath99
@@ -198,12 +198,12 @@ flowchart TB
 
   subgraph sgFinalists["6. Finalists"]
     direction LR
-    m104["F: 🇪🇸 Spain vs 🇦🇷 Argentina"]:::pending
+    m104["F: 🇪🇸 Spain 1-0* 🇦🇷 Argentina → 🇪🇸 Spain"]:::hit
   end
 
   subgraph sgWinner["7. Winner"]
     direction LR
-    champion["Champion TBD · predicted: 🇪🇸 Spain"]:::pending
+    champion["Champion: 🇪🇸 Spain"]:::champ
   end
 
   sgPlacement --> sgKnockout
@@ -222,7 +222,7 @@ flowchart TB
 | QF | Argentina, Belgium, England, France, Spain | Brazil, Netherlands, Portugal |
 | SF | Argentina, France, Spain | Brazil |
 | Final | Argentina, Spain | — |
-| Champion | _pending_ | _pending_ |
+| Champion | Spain | — |
 
 ## 📊 Group Placements
 

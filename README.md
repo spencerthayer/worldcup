@@ -12,7 +12,7 @@ See the [results](results.md).
 | `generate_bracket.py` | **Main bracket generator** — Monte Carlo simulation + optimization |
 | `generate_results.py` | **Results tracker** — compares predictions vs actual results, tracks score |
 | `update_results.py` | **Match result updater** — CLI for entering actual match scores; auto-resolves bracket match numbers |
-| `sync_results_from_ics.py` | Syncs results from BetExplorer ICS calendar |
+| `sync_results_from_ics.py` | Syncs results from FIFA's official API (authoritative; kubeia ICS calendar as fallback — note the ICS feed stores 90-minute scorelines for matches decided in extra time) |
 | `scripts/download_data.py` | Downloads raw data from all sources into `_data/raw/` |
 | `scripts/download_github_data.py` | Downloads data from GitHub-hosted sources |
 | `scripts/normalize_data.py` | Normalizes raw odds from all sources into a common schema |

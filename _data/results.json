@@ -432,15 +432,6 @@
       "played": true,
       "group": "K"
     },
-    "Switzerland_vs_Canada": {
-      "team1": "Switzerland",
-      "team2": "Canada",
-      "score1": 2,
-      "score2": 1,
-      "winner": "Switzerland",
-      "played": true,
-      "group": "B"
-    },
     "Bosnia_&_Herzegovina_vs_Qatar": {
       "team1": "Bosnia & Herzegovina",
       "team2": "Qatar",
@@ -450,14 +441,14 @@
       "played": true,
       "group": "B"
     },
-    "Scotland_vs_Brazil": {
-      "team1": "Scotland",
-      "team2": "Brazil",
-      "score1": 0,
-      "score2": 3,
-      "winner": "Brazil",
+    "Switzerland_vs_Canada": {
+      "team1": "Switzerland",
+      "team2": "Canada",
+      "score1": 2,
+      "score2": 1,
+      "winner": "Switzerland",
       "played": true,
-      "group": "C"
+      "group": "B"
     },
     "Morocco_vs_Haiti": {
       "team1": "Morocco",
@@ -465,6 +456,15 @@
       "score1": 4,
       "score2": 2,
       "winner": "Morocco",
+      "played": true,
+      "group": "C"
+    },
+    "Scotland_vs_Brazil": {
+      "team1": "Scotland",
+      "team2": "Brazil",
+      "score1": 0,
+      "score2": 3,
+      "winner": "Brazil",
       "played": true,
       "group": "C"
     },
@@ -486,21 +486,21 @@
       "played": true,
       "group": "A"
     },
-    "Ecuador_vs_Germany": {
-      "team1": "Ecuador",
-      "team2": "Germany",
-      "score1": 2,
-      "score2": 1,
-      "winner": "Ecuador",
-      "played": true,
-      "group": "E"
-    },
     "Curaçao_vs_Ivory_Coast": {
       "team1": "Curaçao",
       "team2": "Ivory Coast",
       "score1": 0,
       "score2": 2,
       "winner": "Ivory Coast",
+      "played": true,
+      "group": "E"
+    },
+    "Ecuador_vs_Germany": {
+      "team1": "Ecuador",
+      "team2": "Germany",
+      "score1": 2,
+      "score2": 1,
+      "winner": "Ecuador",
       "played": true,
       "group": "E"
     },
@@ -540,21 +540,21 @@
       "played": true,
       "group": "D"
     },
-    "Norway_vs_France": {
-      "team1": "Norway",
-      "team2": "France",
-      "score1": 1,
-      "score2": 4,
-      "winner": "France",
-      "played": true,
-      "group": "I"
-    },
     "Senegal_vs_Iraq": {
       "team1": "Senegal",
       "team2": "Iraq",
       "score1": 5,
       "score2": 0,
       "winner": "Senegal",
+      "played": true,
+      "group": "I"
+    },
+    "Norway_vs_France": {
+      "team1": "Norway",
+      "team2": "France",
+      "score1": 1,
+      "score2": 4,
+      "winner": "France",
       "played": true,
       "group": "I"
     },
@@ -612,15 +612,6 @@
       "played": true,
       "group": "L"
     },
-    "Colombia_vs_Portugal": {
-      "team1": "Colombia",
-      "team2": "Portugal",
-      "score1": 0,
-      "score2": 0,
-      "winner": "draw",
-      "played": true,
-      "group": "K"
-    },
     "DR_Congo_vs_Uzbekistan": {
       "team1": "DR Congo",
       "team2": "Uzbekistan",
@@ -630,14 +621,14 @@
       "played": true,
       "group": "K"
     },
-    "Jordan_vs_Argentina": {
-      "team1": "Jordan",
-      "team2": "Argentina",
-      "score1": 1,
-      "score2": 3,
-      "winner": "Argentina",
+    "Colombia_vs_Portugal": {
+      "team1": "Colombia",
+      "team2": "Portugal",
+      "score1": 0,
+      "score2": 0,
+      "winner": "draw",
       "played": true,
-      "group": "J"
+      "group": "K"
     },
     "Algeria_vs_Austria": {
       "team1": "Algeria",
@@ -645,6 +636,15 @@
       "score1": 3,
       "score2": 3,
       "winner": "draw",
+      "played": true,
+      "group": "J"
+    },
+    "Jordan_vs_Argentina": {
+      "team1": "Jordan",
+      "team2": "Argentina",
+      "score1": 1,
+      "score2": 3,
+      "winner": "Argentina",
       "played": true,
       "group": "J"
     }
@@ -737,7 +737,7 @@
     "Belgium_vs_Senegal": {
       "team1": "Belgium",
       "team2": "Senegal",
-      "score1": 2,
+      "score1": 3,
       "score2": 2,
       "winner": "Belgium",
       "played": true,
@@ -800,8 +800,8 @@
     "Argentina_vs_Cape_Verde": {
       "team1": "Argentina",
       "team2": "Cape Verde",
-      "score1": 1,
-      "score2": 1,
+      "score1": 3,
+      "score2": 2,
       "winner": "Argentina",
       "played": true,
       "extra_time": true,
@@ -924,7 +924,7 @@
       "team1": "Norway",
       "team2": "England",
       "score1": 1,
-      "score2": 1,
+      "score2": 2,
       "winner": "England",
       "played": true,
       "extra_time": true,
@@ -934,7 +934,7 @@
     "Argentina_vs_Switzerland": {
       "team1": "Argentina",
       "team2": "Switzerland",
-      "score1": 1,
+      "score1": 3,
       "score2": 1,
       "winner": "Argentina",
       "played": true,
@@ -961,8 +961,19 @@
       "played": true,
       "match_num": 102,
       "round": "semi_finals"
+    },
+    "Spain_vs_Argentina": {
+      "team1": "Spain",
+      "team2": "Argentina",
+      "score1": 1,
+      "score2": 0,
+      "winner": "Spain",
+      "played": true,
+      "extra_time": true,
+      "match_num": 104,
+      "round": "final"
     }
   },
-  "last_updated": "2026-07-16T16:17:26.907330+00:00",
-  "source": "kubeia ICS calendar"
+  "last_updated": "2026-07-23T21:52:38.361196+00:00",
+  "source": "FIFA API (api.fifa.com)"
 }

@@ -185,6 +185,8 @@ def parse_knockout_results(results):
             "winner": winner,
             "match_num": match.get("match_num"),
             "round": match.get("round"),
+            "extra_time": match.get("extra_time"),
+            "penalties": match.get("penalties"),
             "played": played,
         }
     return parsed
@@ -587,7 +589,10 @@ def format_match_label(match_num, match, round_key, compact=False):
         return f"{round_tag} #{match_num}: {t1} vs {t2}"
     s1, s2 = match["score1"], match["score2"]
     w_short = f"{flag(match['winner'])} {short_team(match['winner'])}"
-    suffix = "*" if s1 == s2 else ""  # * = AET/pens
+    # * = decided in extra time or penalties. Prefer the explicit flags
+    # (FIFA API scores already include ET goals); fall back to a level
+    # scoreline for entries that predate the flags.
+    suffix = "*" if (match.get("extra_time") or match.get("penalties") or s1 == s2) else ""
     if compact:
         return f"{round_tag}: {t1} {s1}-{s2}{suffix} {t2} → {w_short}"
     return f"{round_tag} #{match_num}: {t1} {s1}-{s2} {t2}{suffix} → {w_short}"

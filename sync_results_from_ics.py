@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """
-Sync match results from the kubeia ICS calendar into _data/results.json.
+Sync match results into _data/results.json.
+
+Primary source: FIFA's official API (api.fifa.com) — authoritative final
+scores with correct extra-time and penalty outcomes. The kubeia ICS
+calendar is kept as a fallback only: it records 90-minute scorelines for
+matches decided in extra time (e.g. it had the 2026 final as 0-0 when
+Spain actually won 1-0 AET), so never trust it when FIFA is reachable.
 
 Usage:
     python3 sync_results_from_ics.py
     python3 sync_results_from_ics.py --generate
+    python3 sync_results_from_ics.py --source ics   # force a source
 """
 
 import argparse
@@ -12,6 +19,7 @@ import json
 import re
 import subprocess
 import sys
+import unicodedata
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,9 +27,22 @@ from pathlib import Path
 from generate_bracket import nteam
 
 ICS_URL = "https://calendar.kubeia.io/world-cup-with-alarm-with-score-tv-united-states-of-america-the.ics"
+FIFA_API_URL = (
+    "https://api.fifa.com/api/v3/calendar/matches"
+    "?idCompetition=17&idSeason=285023&count=200&language=en"
+)
 FIXTURES_PATH = Path("_data/raw/openfootball/worldcup-2026.json")
 RESULTS_PATH = Path("_data/results.json")
 ICS_OUT = Path("_data/raw/betexplorer/world-cup-calendar.ics")
+FIFA_OUT = Path("_data/raw/fifa/matches.json")
+
+# FIFA ResultType values: 1 = regulation, 2 = decided on penalties,
+# 3 = decided in extra time (score already includes ET goals).
+FIFA_RT_PENALTIES = 2
+FIFA_RT_EXTRA_TIME = 3
+
+# FIFA display names that nteam() cannot canonicalize on its own.
+FIFA_NAME_OVERRIDES = {"IR Iran": "Iran"}
 
 SCORE_RE = re.compile(r"^(.+?) (\d+) - (\d+) (.+?) \(")
 MATCH_NUM_RE = re.compile(r"\((\d+)\)\)?(?:\s*$|\s*\()")
@@ -54,6 +75,84 @@ def load_fixtures():
 def fixture_name(raw, canon_to_fixture):
     canonical = nteam(clean_summary_teams(raw))
     return canon_to_fixture.get(canonical, canonical)
+
+
+def fetch_fifa_matches(fifa_url=FIFA_API_URL, fifa_out=FIFA_OUT):
+    req = urllib.request.Request(fifa_url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        payload = json.loads(resp.read().decode("utf-8"))
+    fifa_out.parent.mkdir(parents=True, exist_ok=True)
+    fifa_out.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+    return payload.get("Results", [])
+
+
+def fifa_team_name(raw, canon_to_fixture):
+    raw = FIFA_NAME_OVERRIDES.get(raw, raw)
+    ascii_name = unicodedata.normalize("NFKD", raw).encode("ascii", "ignore").decode()
+    canonical = nteam(re.sub(r"\s+", " ", ascii_name).strip())
+    return canon_to_fixture.get(canonical, canonical)
+
+
+def results_from_fifa(fifa_matches, canon_to_fixture, fixture_by_pair):
+    """Build (group, knockout) result dicts from FIFA API match objects."""
+    matches = {}
+    knockout = {}
+    for fm in fifa_matches:
+        if fm.get("MatchStatus") != 0:  # 0 = played/official
+            continue
+        s1, s2 = fm.get("HomeTeamScore"), fm.get("AwayTeamScore")
+        if s1 is None or s2 is None:
+            continue
+        t1 = fifa_team_name(fm.get("Home", {}).get("ShortClubName", ""), canon_to_fixture)
+        t2 = fifa_team_name(fm.get("Away", {}).get("ShortClubName", ""), canon_to_fixture)
+
+        winner_id = str(fm.get("Winner") or "")
+        if winner_id and winner_id == str(fm.get("Home", {}).get("IdTeam")):
+            winner = t1
+        elif winner_id and winner_id == str(fm.get("Away", {}).get("IdTeam")):
+            winner = t2
+        elif s1 > s2:
+            winner = t1
+        elif s2 > s1:
+            winner = t2
+        else:
+            winner = "draw"
+
+        entry = {
+            "team1": t1,
+            "team2": t2,
+            "score1": s1,
+            "score2": s2,
+            "winner": winner,
+            "played": True,
+        }
+
+        match_num = fm.get("MatchNumber")
+        ko_round = knockout_round_for_match_num(match_num)
+        pair = tuple(sorted([nteam(t1), nteam(t2)]))
+        if ko_round:
+            if fm.get("ResultType") in (FIFA_RT_EXTRA_TIME, FIFA_RT_PENALTIES):
+                entry["extra_time"] = True
+            if fm.get("ResultType") == FIFA_RT_PENALTIES:
+                entry["penalties"] = True
+            entry["match_num"] = match_num
+            entry["round"] = ko_round
+            key = t1.replace(" ", "_") + "_vs_" + t2.replace(" ", "_")
+            knockout[key] = entry
+        elif match_num is not None and match_num >= 73:
+            continue  # third-place playoff (103) — not tracked in this bracket
+        elif pair in fixture_by_pair:
+            fixture_match = fixture_by_pair[pair]
+            key = (
+                fixture_match["team1"].replace(" ", "_")
+                + "_vs_"
+                + fixture_match["team2"].replace(" ", "_")
+            )
+            entry["team1"] = fixture_match["team1"]
+            entry["team2"] = fixture_match["team2"]
+            entry["group"] = fixture_match["group"].replace("Group ", "")
+            matches[key] = entry
+    return matches, knockout
 
 
 def parse_match_num(summary):
@@ -135,13 +234,18 @@ def resolve_knockout_winner(summary, t1, t2, s1, s2, event_text, canon_to_fixtur
     return "draw", False, False
 
 
-def sync_results(ics_url=ICS_URL, results_path=RESULTS_PATH, ics_out=ICS_OUT):
+def parse_ics_results(ics_url, ics_out, canon_to_fixture, fixture_by_pair):
+    """Legacy fallback: parse results from the kubeia ICS calendar.
+
+    WARNING: this feed stores 90-minute scorelines for matches decided in
+    extra time, so AET scorelines synced this way are wrong (winners and
+    penalty outcomes are still resolved correctly).
+    """
     with urllib.request.urlopen(ics_url, timeout=60) as resp:
         ics = unfold_ics(resp.read().decode("utf-8"))
     ics_out.parent.mkdir(parents=True, exist_ok=True)
     ics_out.write_text(ics)
 
-    _, canon_to_fixture, fixture_by_pair = load_fixtures()
     matches = {}
     knockout = {}
     skipped = []
@@ -212,11 +316,50 @@ def sync_results(ics_url=ICS_URL, results_path=RESULTS_PATH, ics_out=ICS_OUT):
         else:
             skipped.append(summary[:100])
 
+    return matches, knockout, skipped
+
+
+def sync_results(
+    results_path=RESULTS_PATH,
+    ics_url=ICS_URL,
+    ics_out=ICS_OUT,
+    fifa_url=FIFA_API_URL,
+    fifa_out=FIFA_OUT,
+    source="auto",
+):
+    _, canon_to_fixture, fixture_by_pair = load_fixtures()
+
+    matches = knockout = None
+    skipped = []
+    if source in ("auto", "fifa"):
+        try:
+            fifa_matches = fetch_fifa_matches(fifa_url, fifa_out)
+            matches, knockout = results_from_fifa(
+                fifa_matches, canon_to_fixture, fixture_by_pair
+            )
+            if not matches and not knockout:
+                raise ValueError("FIFA API returned no played matches")
+            used_source = "FIFA API (api.fifa.com)"
+        except Exception as exc:
+            if source == "fifa":
+                raise
+            print(
+                f"WARNING: FIFA API sync failed ({exc}); "
+                "falling back to kubeia ICS calendar",
+                file=sys.stderr,
+            )
+            matches = knockout = None
+    if matches is None:
+        matches, knockout, skipped = parse_ics_results(
+            ics_url, ics_out, canon_to_fixture, fixture_by_pair
+        )
+        used_source = "kubeia ICS calendar (fallback; AET scorelines unreliable)"
+
     results = {
         "matches": matches,
         "knockout_matches": knockout,
         "last_updated": datetime.now(timezone.utc).isoformat(),
-        "source": "kubeia ICS calendar",
+        "source": used_source,
     }
     results_path.write_text(json.dumps(results, indent=2, ensure_ascii=False) + "\n")
     return {
@@ -224,22 +367,36 @@ def sync_results(ics_url=ICS_URL, results_path=RESULTS_PATH, ics_out=ICS_OUT):
         "knockout_matches": len(knockout),
         "skipped": len(skipped),
         "results_path": str(results_path),
-        "ics_path": str(ics_out),
+        "source": used_source,
     }
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Sync results.json from kubeia ICS calendar")
+    parser = argparse.ArgumentParser(
+        description="Sync results.json from the FIFA API (kubeia ICS calendar as fallback)"
+    )
     parser.add_argument("--results", default=str(RESULTS_PATH))
     parser.add_argument("--ics-out", default=str(ICS_OUT))
+    parser.add_argument("--fifa-out", default=str(FIFA_OUT))
+    parser.add_argument(
+        "--source",
+        choices=["auto", "fifa", "ics"],
+        default="auto",
+        help="Data source: 'auto' tries FIFA first and falls back to ICS",
+    )
     parser.add_argument("--generate", action="store_true", help="Run generate_results.py after sync")
     args = parser.parse_args()
 
-    stats = sync_results(results_path=Path(args.results), ics_out=Path(args.ics_out))
+    stats = sync_results(
+        results_path=Path(args.results),
+        ics_out=Path(args.ics_out),
+        fifa_out=Path(args.fifa_out),
+        source=args.source,
+    )
     print(
         f"Synced {stats['group_matches']} group matches, "
         f"{stats['knockout_matches']} knockout matches "
-        f"-> {stats['results_path']}"
+        f"-> {stats['results_path']} [{stats['source']}]"
     )
     if stats["skipped"]:
         print(f"Skipped {stats['skipped']} unmatched summaries")
